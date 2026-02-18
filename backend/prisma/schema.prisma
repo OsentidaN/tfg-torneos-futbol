@@ -1,0 +1,375 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// TORNEOS
+// ============================================
+model Tournament {
+  id       Int              @id @default(autoincrement())
+  name     String           @db.VarChar(100)
+  type     TournamentType
+  seasons  Season[]
+  
+  @@map("tournaments")
+}
+
+enum TournamentType {
+  WORLD_CUP
+  EURO_CUP
+}
+
+// ============================================
+// TEMPORADAS/EDICIONES
+// ============================================
+model Season {
+  id            Int        @id @default(autoincrement())
+  tournamentId  Int        @map("tournament_id")
+  year          Int
+  hostCountry   String?    @map("host_country") @db.VarChar(100)
+  startDate     DateTime?  @map("start_date") @db.Date
+  endDate       DateTime?  @map("end_date") @db.Date
+  winner        String?    @db.VarChar(100)
+  imageUrl      String?    @map("image_url") @db.VarChar(500)
+  
+  // IDs externos de la API
+  apiId         Int?       @unique @map("api_id")
+  apiSource     String?    @map("api_source") @db.VarChar(50)
+  dataQuality   DataQuality @default(FULL) @map("data_quality")
+  
+  // Metadatos
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  
+  // Relaciones
+  tournament    Tournament @relation(fields: [tournamentId], references: [id])
+  matches       Match[]
+  seasonTeams   SeasonTeam[]
+  
+  
+  @@unique([tournamentId, year])
+  @@index([year])
+  @@map("seasons")
+}
+
+// ============================================
+// EQUIPOS
+// ============================================
+model Team {
+  id            Int              @id @default(autoincrement())
+  name          String           @unique @db.VarChar(100)
+  code          String?          @db.VarChar(3)
+  flagUrl       String?          @map("flag_url") @db.VarChar(500)
+  confederation String?          @db.VarChar(50)
+  
+  // IDs externos
+  apiId         Int?             @unique @map("api_id")
+  
+  // Relaciones
+  seasonTeams   SeasonTeam[]
+  matchesHome   Match[]          @relation("HomeTeam")
+  matchesAway   Match[]          @relation("AwayTeam")
+  players       Player[]
+  teamStats     MatchTeamStats[]
+  
+  @@map("teams")
+}
+
+// ============================================
+// EQUIPOS POR TEMPORADA
+// ============================================
+model SeasonTeam {
+  id            Int      @id @default(autoincrement())
+  seasonId      Int      @map("season_id")
+  teamId        Int      @map("team_id")
+  group         String?  @db.VarChar(1)
+  
+  // Estadísticas del torneo
+  played        Int      @default(0)
+  won           Int      @default(0)
+  drawn         Int      @default(0)
+  lost          Int      @default(0)
+  goalsFor      Int      @default(0) @map("goals_for")
+  goalsAgainst  Int      @default(0) @map("goals_against")
+  points        Int      @default(0)
+  position      Int?
+  
+  // Relaciones
+  season        Season   @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  team          Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  
+  @@unique([seasonId, teamId])
+  @@index([seasonId])
+  @@map("season_teams")
+}
+
+// ============================================
+// PARTIDOS
+// ============================================
+model Match {
+  id                Int                @id @default(autoincrement())
+  seasonId          Int                @map("season_id")
+  homeTeamId        Int                @map("home_team_id")
+  awayTeamId        Int                @map("away_team_id")
+  
+  // Información del partido
+  round             String             @db.VarChar(50)
+  stage             MatchStage
+  matchday          Int?
+  date              DateTime           @db.Timestamp
+  venue             String?            @db.VarChar(255)
+  city              String?            @db.VarChar(100)
+  attendance        Int?
+  referee           String?            @db.VarChar(100)
+  
+  // Resultados
+  homeGoals         Int                @default(0) @map("home_goals")
+  awayGoals         Int                @default(0) @map("away_goals")
+  homeGoalsPenalty  Int?               @map("home_goals_penalty")
+  awayGoalsPenalty  Int?               @map("away_goals_penalty")
+  status            MatchStatus        @default(SCHEDULED)
+  
+  // IDs externos
+  apiId             Int?               @unique @map("api_id")
+  
+  // Metadatos
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  
+  // Relaciones
+  season            Season             @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  homeTeam          Team               @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam          Team               @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  events            MatchEvent[]
+  teamStats         MatchTeamStats[]
+  playerStats       MatchPlayerStats[]
+  lineups           Lineup[]
+  favorites         Favorite[]
+  
+  @@index([seasonId])
+  @@index([date])
+  @@index([stage])
+  @@index([homeTeamId])  
+  @@index([awayTeamId]) 
+  @@map("matches")
+}
+
+enum MatchStage {
+  GROUP
+  ROUND_OF_16
+  QUARTER_FINAL
+  SEMI_FINAL
+  THIRD_PLACE
+  FINAL
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  FINISHED
+  POSTPONED
+  CANCELLED
+}
+
+// ============================================
+// EVENTOS DEL PARTIDO
+// ============================================
+model MatchEvent {
+  id          Int       @id @default(autoincrement())
+  matchId     Int       @map("match_id")
+  playerId    Int?      @map("player_id")
+  teamId      Int       @map("team_id")
+  
+  type        EventType
+  minute      Int
+  extraMinute Int?      @map("extra_minute")
+  detail      String?   @db.VarChar(255)
+  
+  // Relaciones
+  match       Match     @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player      Player?   @relation(fields: [playerId], references: [id])
+  
+  @@index([matchId])
+  @@map("match_events")
+}
+
+enum EventType {
+  GOAL
+  OWN_GOAL
+  PENALTY
+  YELLOW_CARD
+  RED_CARD
+  SUBSTITUTION
+}
+
+// ============================================
+// ESTADÍSTICAS POR EQUIPO
+// ============================================
+model MatchTeamStats {
+  id              Int     @id @default(autoincrement())
+  matchId         Int     @map("match_id")
+  teamId          Int     @map("team_id")
+  
+  possession      Int?
+  shotsTotal      Int?    @map("shots_total")
+  shotsOnTarget   Int?    @map("shots_on_target")
+  shotsOffTarget  Int?    @map("shots_off_target")
+  shotsBlocked    Int?    @map("shots_blocked")
+  corners         Int?
+  offsides        Int?
+  fouls           Int?
+  yellowCards     Int?    @map("yellow_cards")
+  redCards        Int?    @map("red_cards")
+  passes          Int?
+  passesAccurate  Int?    @map("passes_accurate")
+  
+  // Relaciones
+  match           Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  team            Team    @relation(fields: [teamId], references: [id])
+  
+  @@unique([matchId, teamId])
+  @@index([teamId])
+  @@map("match_team_stats")
+}
+
+// ============================================
+// JUGADORES
+// ============================================
+model Player {
+  id          Int                  @id @default(autoincrement())
+  firstName   String               @map("first_name") @db.VarChar(100)
+  lastName    String               @map("last_name") @db.VarChar(100)
+  birthDate   DateTime?            @map("birth_date") @db.Date
+  nationality String?              @db.VarChar(100)
+  position    Position
+  photoUrl    String?              @map("photo_url") @db.VarChar(500)
+  
+  teamId      Int?                 @map("team_id")
+  apiId       Int?                 @unique @map("api_id")
+  
+  // Relaciones
+  team        Team?                @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  playerStats MatchPlayerStats[]
+  lineups     Lineup[]
+  events      MatchEvent[]
+  
+  @@index([teamId])
+  @@map("players")
+}
+
+enum Position {
+  GOALKEEPER
+  DEFENDER
+  MIDFIELDER
+  FORWARD
+}
+
+// ============================================
+// ESTADÍSTICAS INDIVIDUALES
+// ============================================
+model MatchPlayerStats {
+  id              Int     @id @default(autoincrement())
+  matchId         Int     @map("match_id")
+  playerId        Int     @map("player_id")
+  
+  minutesPlayed   Int     @default(0) @map("minutes_played")
+  goals           Int     @default(0)
+  assists         Int     @default(0)
+  yellowCards     Int     @default(0) @map("yellow_cards")
+  redCards        Int     @default(0) @map("red_cards")
+  shotsTotal      Int?    @map("shots_total")
+  shotsOnTarget   Int?    @map("shots_on_target")
+  passes          Int?
+  passesAccurate  Int?    @map("passes_accurate")
+  rating          Float?
+  
+  // Relaciones
+  match           Match   @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player          Player  @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  @@unique([matchId, playerId])
+  @@index([matchId])
+  @@index([playerId])
+  @@map("match_player_stats")
+}
+
+// ============================================
+// ALINEACIONES
+// ============================================
+model Lineup {
+  id            Int      @id @default(autoincrement())
+  matchId       Int      @map("match_id")
+  teamId        Int      @map("team_id")
+  playerId      Int      @map("player_id")
+  
+  starter       Boolean  @default(false)
+  position      String?  @db.VarChar(50)
+  shirtNumber   Int?     @map("shirt_number")
+  
+  substituteIn  Int?     @map("substitute_in")
+  substituteOut Int?     @map("substitute_out")
+  
+  // Relaciones
+  match         Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player        Player   @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  
+  @@unique([matchId, playerId])
+  @@index([matchId])
+  @@map("lineups")
+}
+
+
+// ============================================
+// USUARIOS Y FAVORITOS
+// ============================================
+model User {
+  id           Int        @id @default(autoincrement())
+  email        String     @unique @db.VarChar(255)
+  passwordHash String     @map("password_hash") @db.VarChar(255)
+  name         String     @db.VarChar(100)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  active       Boolean    @default(true)
+  
+  favorites    Favorite[]
+  
+  @@index([email])
+  @@map("users")
+}
+
+model Favorite {
+  id           Int          @id @default(autoincrement())
+  userId       Int          @map("user_id")
+  favoriteType FavoriteType @map("favorite_type")
+  seasonId     Int?         @map("season_id")
+  matchId      Int?         @map("match_id")
+  createdAt    DateTime     @default(now()) @map("created_at")
+  
+  // Relaciones
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match        Match?       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+  @@map("favorites")
+}
+
+enum FavoriteType {
+  SEASON
+  MATCH
+}
+
+enum DataQuality {
+  FULL      // Datos completos (2014+)
+  PARTIAL   // Datos parciales (2006-2014)
+  BASIC     // Solo resultados (<2006)
+}

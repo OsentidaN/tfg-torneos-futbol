@@ -1,25 +1,51 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend API - TFG Torneos de Fútbol",
+  "main": "dist/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "prisma:generate": "prisma generate --data-proxy",
+    "prisma:studio": "prisma studio",
+    "prisma:push": "prisma db push",
+    "etl:seasons": "ts-node src/scripts/etl/importSeasons.ts",
+    "etl:matches": "ts-node src/scripts/etl/importMatches.ts",
+    "etl:all": "npm run etl:seasons && npm run etl:matches"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "typescript",
+    "prisma",
+    "postgresql",
+    "express",
+    "tfg"
+  ],
+  "author": "Osentida Nguema Rodríguez",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/client": "^5.20.0",
+    "@types/express-validator": "^2.20.33",
+    "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
     "cors": "^2.8.6",
-    "dotenv": "^17.2.4",
+    "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
     "jsonwebtoken": "^9.0.3",
     "pg": "^8.18.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.11"
+    "@types/bcrypt": "^6.0.0",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^25.2.3",
+    "nodemon": "^3.1.11",
+    "prisma": "^5.20.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
   }
 }
