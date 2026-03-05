@@ -5,87 +5,63 @@ const API_KEY = process.env.API_FOOTBALL_KEY!;
 const API_URL = process.env.API_FOOTBALL_URL!;
 
 /**
- * PASO 2: IMPORTAR ESTADÍSTICAS DE PARTIDOS
+ * 🚀 PASO 2: ESTADÍSTICAS DE PARTIDOS 
  * 
- * Este script importa las estadísticas detalladas de cada partido:
- * - Posesión del balón
- * - Tiros (totales, a puerta, fuera, bloqueados)
- * - Corners
- * - Faltas
- * - Tarjetas
- * - Pases totales
- * 
- * Ejecutar: npm run etl:match-stats
- * 
- * IMPORTANTE: Este script hace ~1 request por partido
- * Con 115 partidos = ~115 requests
- * Dividir en 2 días (100 requests/día límite)
+ * Optimizado para suscripción de pago:
+ * - Sin límite de requests
+ * - Delays mínimos (200ms)
+ * - Procesa TODOS los partidos de una vez
  */
 
 interface MatchStats {
-    team: {
-        id: number;
-        name: string;
-    };
-    statistics: Array<{
-        type: string;
-        value: any;
-    }>;
+    team: { id: number; name: string };
+    statistics: Array<{ type: string; value: any }>;
 }
 
-// Configuración: cuántos partidos procesar por ejecución
-const BATCH_SIZE = 90; // Dejar margen de 10 requests para otros endpoints
+const CONFIG = {
+    DELAY: 200,  // 200ms en lugar de 1100ms
+    MAX_RETRIES: 3
+};
 
 async function importMatchStats() {
-    console.log('📊 ===== IMPORTANDO ESTADÍSTICAS DE PARTIDOS =====\n');
+    console.log('📊 ===== ESTADÍSTICAS DE PARTIDOS (PLAN DE PAGO) =====\n');
     
+    const startTime = Date.now();
     let requestCount = 0;
     let processedCount = 0;
     let skippedCount = 0;
     let errorCount = 0;
 
     try {
-        // 1. Obtener todos los partidos finalizados que no tienen estadísticas
+        // Obtener TODOS los partidos sin stats
         const matches = await prisma.match.findMany({
             where: {
                 status: 'FINISHED',
-                // Solo partidos que aún no tienen estadísticas importadas
-                teamStats: {
-                    none: {}
-                }
+                teamStats: { none: {} }
             },
             include: {
                 homeTeam: true,
                 awayTeam: true,
-                season: {
-                    include: {
-                        tournament: true
-                    }
-                }
+                season: { include: { tournament: true } }
             },
-            orderBy: {
-                date: 'desc' // Más recientes primero
-            },
-            take: BATCH_SIZE
+            orderBy: { date: 'desc' }
         });
 
-        console.log(`✓ Encontrados ${matches.length} partidos para procesar`);
+        console.log(`✓ Encontrados ${matches.length} partidos\n`);
         
         if (matches.length === 0) {
-            console.log('✅ Todos los partidos ya tienen estadísticas importadas\n');
+            console.log('✅ Todos completados\n');
             return;
         }
 
-        console.log(`📌 Procesando batch de ${Math.min(matches.length, BATCH_SIZE)} partidos\n`);
-
-        // 2. Procesar cada partido
-        for (const match of matches) {
+        // Procesar todos
+        for (let i = 0; i < matches.length; i++) {
+            const match = matches[i];
+            
             try {
-                console.log(`\n⚽ Partido: ${match.homeTeam.name} vs ${match.awayTeam.name}`);
-                console.log(`   Fecha: ${match.date.toISOString().split('T')[0]}`);
-                console.log(`   Torneo: ${match.season.tournament.name} ${match.season.year}`);
+                const progress = `[${i + 1}/${matches.length}]`;
+                console.log(`${progress} ${match.homeTeam.name} vs ${match.awayTeam.name}`);
 
-                // 3. Obtener estadísticas del partido desde la API
                 const response = await axios.get(`${API_URL}/fixtures/statistics`, {
                     headers: { 'x-apisports-key': API_KEY },
                     params: { fixture: match.apiId }
@@ -95,38 +71,28 @@ async function importMatchStats() {
                 const statsData: MatchStats[] = response.data.response;
 
                 if (!statsData || statsData.length === 0) {
-                    console.log('   ⚠️  Sin estadísticas disponibles');
+                    console.log(`          ⚠️  Sin datos`);
                     skippedCount++;
-                    await new Promise(r => setTimeout(r, 1100)); // Rate limit
+                    await new Promise(r => setTimeout(r, CONFIG.DELAY));
                     continue;
                 }
 
-                // 4. Procesar estadísticas de cada equipo
+                // Procesar equipos
                 for (const teamStats of statsData) {
                     const isHomeTeam = teamStats.team.id === match.homeTeam.apiId;
                     const teamId = isHomeTeam ? match.homeTeamId : match.awayTeamId;
 
-                    // Extraer valores de las estadísticas
                     const getStatValue = (type: string): number | null => {
                         const stat = teamStats.statistics.find(s => s.type === type);
                         if (!stat || stat.value === null) return null;
-                        
-                        // Manejar porcentajes como "65%"
                         if (typeof stat.value === 'string' && stat.value.includes('%')) {
                             return parseInt(stat.value.replace('%', ''));
                         }
-                        
                         return typeof stat.value === 'number' ? stat.value : parseInt(stat.value) || null;
                     };
 
-                    // 5. Guardar en base de datos
                     await prisma.matchTeamStats.upsert({
-                        where: {
-                            matchId_teamId: {
-                                matchId: match.id,
-                                teamId: teamId
-                            }
-                        },
+                        where: { matchId_teamId: { matchId: match.id, teamId } },
                         update: {
                             possession: getStatValue('Ball Possession'),
                             shotsTotal: getStatValue('Total Shots'),
@@ -143,7 +109,7 @@ async function importMatchStats() {
                         },
                         create: {
                             matchId: match.id,
-                            teamId: teamId,
+                            teamId,
                             possession: getStatValue('Ball Possession'),
                             shotsTotal: getStatValue('Total Shots'),
                             shotsOnTarget: getStatValue('Shots on Goal'),
@@ -160,61 +126,53 @@ async function importMatchStats() {
                     });
                 }
 
-                console.log('   ✅ Estadísticas guardadas');
+                console.log(`          ✅ Guardado`);
                 processedCount++;
 
-                // Rate limit: 1 segundo entre requests
-                await new Promise(r => setTimeout(r, 1100));
+                // Delay mínimo
+                await new Promise(r => setTimeout(r, CONFIG.DELAY));
 
             } catch (error) {
-                console.error(`   ❌ Error procesando partido:`, error);
+                console.error(`          ❌ Error`);
                 errorCount++;
                 
-                // Si es error 429 (rate limit), esperar más tiempo
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
-                    console.log('   ⏸️  Rate limit alcanzado, esperando 60 segundos...');
-                    await new Promise(r => setTimeout(r, 60000));
+                    console.log('          ⏸️  Rate limit, esperando 30s...');
+                    await new Promise(r => setTimeout(r, 30000));
                 }
-                
                 continue;
             }
         }
 
-        // 6. Resumen
-        console.log('\n📊 ===== RESUMEN DE IMPORTACIÓN =====');
-        console.log(`Requests realizados: ${requestCount}`);
-        console.log(`Partidos procesados: ${processedCount}`);
-        console.log(`Partidos sin datos: ${skippedCount}`);
-        console.log(`Errores: ${errorCount}`);
+        // Resumen
+        const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
+        console.log('\n📊 ===== RESUMEN =====');
+        console.log(`⚡ Tiempo: ${elapsed} min`);
+        console.log(`📡 Requests: ${requestCount}`);
+        console.log(`✅ Procesados: ${processedCount}`);
+        console.log(`⚠️  Sin datos: ${skippedCount}`);
+        console.log(`❌ Errores: ${errorCount}`);
 
-        // Verificar cuántos partidos quedan
-        const remainingMatches = await prisma.match.count({
-            where: {
-                status: 'FINISHED',
-                teamStats: { none: {} }
-            }
+        const remaining = await prisma.match.count({
+            where: { status: 'FINISHED', teamStats: { none: {} } }
         });
 
-        if (remainingMatches > 0) {
-            console.log(`\n⚠️  Quedan ${remainingMatches} partidos por procesar`);
-            console.log('💡 Ejecuta el script nuevamente mañana: npm run etl:match-stats');
+        if (remaining === 0) {
+            console.log('\n✅ COMPLETADO');
+            console.log('💡 Siguiente: npm run etl:match-events\n');
         } else {
-            console.log('\n✅ Todos los partidos tienen estadísticas completas');
-            console.log('💡 Siguiente paso: npm run etl:match-events');
+            console.log(`\n⚠️  Quedan ${remaining} partidos`);
+            console.log('💡 Ejecuta de nuevo: npm run etl:match-stats\n');
         }
 
-        console.log('\n===================================\n');
-
     } catch (error) {
-        console.error('\n❌ Error general:', error);
+        console.error('\n❌ Error:', error);
         if (axios.isAxiosError(error)) {
-            console.error('Detalles API:', error.response?.data);
+            console.error('Detalles:', error.response?.data);
         }
     } finally {
         await prisma.$disconnect();
     }
 }
 
-// Ejecutar
 importMatchStats();
-

@@ -16,6 +16,9 @@
     "etl:wc2022": "ts-node --transpile-only src/scripts/etl/importWorldCup2022.ts",
     "etl:step1": "ts-node --transpile-only src/scripts/etl/import-step1-basic.ts",
     "etl:step2": "ts-node --transpile-only src/scripts/etl/import-step2-match-stats.ts",
+    "etl:step3": "ts-node --transpile-only src/scripts/etl/import-step3-match-events.ts",
+    "etl:step4": "ts-node --transpile-only src/scripts/etl/import-step4-players-lineups.ts",
+    "etl:diagnose": "ts-node --transpile-only src/scripts/etl/diagnose-api-data.ts",
     "etl:all": "npm run etl:seasons && npm run etl:matches"
   },
   "keywords": [

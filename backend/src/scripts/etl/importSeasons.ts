@@ -60,7 +60,7 @@ async function importWorldCups() {
 
             for (const season of league.seasons) {
                 // Solo importar desde 2014 en adelante
-                if (season.year < 2014) {
+                if (season.year < 2010) {
                     console.log(`  ⏭️  Saltando Mundial ${season.year} (anterior a 2014)`);
                     continue;
                 }
@@ -147,7 +147,7 @@ async function importEuroCups() {
             console.log(`\n🏆 Procesando: ${league.league.name}`);
 
             for (const season of league.seasons) {
-                if (season.year < 2016) {
+                if (season.year < 2008) {
                     console.log(`  ⏭️  Saltando Euro ${season.year} (anterior a 2016)`);
                     continue;
                 }
