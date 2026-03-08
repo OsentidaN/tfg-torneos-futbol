@@ -6,6 +6,8 @@ const API_URL = process.env.API_FOOTBALL_URL!;
 
 /**
  * 🚀 PASO 4: JUGADORES Y ALINEACIONES 
+ * 
+ * Importa:
  * - Jugadores completos
  * - Alineaciones (todos los años)
  * - Stats de jugadores (solo 2016+)
@@ -22,8 +24,8 @@ const CONFIG = {
 };
 
 async function importPlayersAndLineups() {
-    console.log('👥 ===== JUGADORES Y ALINEACIONES  =====\n');
-    
+    console.log('👥 ===== JUGADORES Y ALINEACIONES (PLAN DE PAGO) =====\n');
+
     const startTime = Date.now();
     let requestCount = 0;
     let lineupsProcessed = 0;
@@ -33,7 +35,7 @@ async function importPlayersAndLineups() {
     try {
         // PARTE 1: LINEUPS (todos los partidos)
         console.log('📋 FASE 1: ALINEACIONES\n');
-        
+
         const matchesForLineups = await prisma.match.findMany({
             where: {
                 status: 'FINISHED',
@@ -51,7 +53,7 @@ async function importPlayersAndLineups() {
 
         for (let i = 0; i < matchesForLineups.length; i++) {
             const match = matchesForLineups[i];
-            
+
             try {
                 const progress = `[${i + 1}/${matchesForLineups.length}]`;
                 console.log(`${progress} ${match.homeTeam.name} vs ${match.awayTeam.name}`);
@@ -116,6 +118,7 @@ async function importPlayersAndLineups() {
                                 update: {},
                                 create: {
                                     matchId: match.id,
+                                    teamId: teamId,
                                     playerId: player.id,
                                     starter: true,
                                     shirtNumber: p.number || null
@@ -164,6 +167,7 @@ async function importPlayersAndLineups() {
                                 update: {},
                                 create: {
                                     matchId: match.id,
+                                    teamId: teamId,
                                     playerId: player.id,
                                     starter: false,
                                     shirtNumber: p.number || null
@@ -222,7 +226,7 @@ async function importPlayersAndLineups() {
 
         for (let i = 0; i < matchesForPlayerStats.length; i++) {
             const match = matchesForPlayerStats[i];
-            
+
             try {
                 const progress = `[${i + 1}/${matchesForPlayerStats.length}]`;
                 console.log(`${progress} ${match.homeTeam.name} vs ${match.awayTeam.name}`);
@@ -269,13 +273,13 @@ async function importPlayersAndLineups() {
                                 shotsTotal: stats.shots?.total || null,
                                 shotsOnTarget: stats.shots?.on || null,
                                 passes: stats.passes?.total || null,
-                                passesAccurate: stats.passes?.accuracy || null,
+                                passesAccurate: stats.passes?.accuracy ? String(stats.passes.accuracy) : null,
                                 yellowCards: stats.cards?.yellow || 0,
                                 redCards: stats.cards?.red || 0
                             },
                             create: {
-                                matchId: match.id,
-                                playerId: player.id,
+                                matchId: match.id,    // ← Usa IDs directos
+                                playerId: player.id,  // ← Usa IDs directos
                                 minutesPlayed: stats.games?.minutes || null,
                                 rating: stats.games?.rating ? parseFloat(stats.games.rating) : null,
                                 goals: stats.goals?.total || 0,
@@ -283,7 +287,7 @@ async function importPlayersAndLineups() {
                                 shotsTotal: stats.shots?.total || null,
                                 shotsOnTarget: stats.shots?.on || null,
                                 passes: stats.passes?.total || null,
-                                passesAccurate: stats.passes?.accuracy || null,
+                                passesAccurate: stats.passes?.accuracy ? String(stats.passes.accuracy) : null,
                                 yellowCards: stats.cards?.yellow || 0,
                                 redCards: stats.cards?.red || 0
                             }

@@ -291,7 +291,7 @@ model MatchPlayerStats {
   shotsTotal      Int?    @map("shots_total")
   shotsOnTarget   Int?    @map("shots_on_target")
   passes          Int?
-  passesAccurate  Int?    @map("passes_accurate")
+  passesAccurate  String? @map("passes_accurate")
   rating          Float?
   
   // Relaciones

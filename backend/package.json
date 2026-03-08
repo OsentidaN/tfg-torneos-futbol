@@ -12,14 +12,11 @@
     "prisma:studio": "prisma studio",
     "prisma:push": "prisma db push",
     "etl:seasons": "ts-node src/scripts/etl/importSeasons.ts",
-    "etl:matches": "ts-node --transpile-only src/scripts/etl/importMatches.ts",
-    "etl:wc2022": "ts-node --transpile-only src/scripts/etl/importWorldCup2022.ts",
     "etl:step1": "ts-node --transpile-only src/scripts/etl/import-step1-basic.ts",
     "etl:step2": "ts-node --transpile-only src/scripts/etl/import-step2-match-stats.ts",
     "etl:step3": "ts-node --transpile-only src/scripts/etl/import-step3-match-events.ts",
     "etl:step4": "ts-node --transpile-only src/scripts/etl/import-step4-players-lineups.ts",
-    "etl:diagnose": "ts-node --transpile-only src/scripts/etl/diagnose-api-data.ts",
-    "etl:all": "npm run etl:seasons && npm run etl:matches"
+    "etl:diagnose": "ts-node --transpile-only src/scripts/etl/diagnose-api-data.ts"
   },
   "keywords": [
     "typescript",
@@ -32,23 +29,29 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@prisma/client": "^5.20.0",
     "@types/express-validator": "^2.20.33",
     "axios": "^1.13.5",
     "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "express-validator": "^7.3.1",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
     "pg": "^8.18.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/morgan": "^1.9.10",
     "@types/node": "^25.2.3",
-    "nodemon": "^3.1.11",
+    "nodemon": "^3.1.14",
     "prisma": "^5.20.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
