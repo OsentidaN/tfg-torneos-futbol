@@ -13,7 +13,8 @@ import {
     faRightFromBracket,
     faStar,
     faBars,
-    faXmark
+    faXmark,
+    faCircleUser
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar() {
@@ -48,6 +49,9 @@ export default function Navbar() {
                         {user && (
                             <li><NavLink to="/favoritos"><FontAwesomeIcon icon={faStar} style={{ fontSize: '0.9rem' }} /> Favoritos</NavLink></li>
                         )}
+                        {user && (
+                            <li><NavLink to="/perfil"><FontAwesomeIcon icon={faCircleUser} style={{ fontSize: '0.9rem' }} /> Perfil</NavLink></li>
+                        )}
                     </ul>
 
                     <div className="auth-group">
@@ -81,6 +85,9 @@ export default function Navbar() {
                         <li><NavLink to="/estadisticas" onClick={closeMenu}><FontAwesomeIcon icon={faChartLine} style={{ width: 24 }} /> Estadísticas</NavLink></li>
                         {user && (
                             <li><NavLink to="/favoritos" onClick={closeMenu}><FontAwesomeIcon icon={faStar} style={{ width: 24 }} /> Favoritos</NavLink></li>
+                        )}
+                        {user && (
+                            <li><NavLink to="/perfil" onClick={closeMenu}><FontAwesomeIcon icon={faCircleUser} style={{ width: 24 }} /> Perfil</NavLink></li>
                         )}
                     </ul>
                     <div className="mobile-auth">

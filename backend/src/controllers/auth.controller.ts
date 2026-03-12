@@ -188,3 +188,55 @@ export const updatePassword = catchAsync(async (req: Request, res: Response) => 
         message: 'Contraseña actualizada correctamente'
     });
 });
+
+// ============================================
+// UPDATE PROFILE (name)
+// ============================================
+
+export const updateProfile = catchAsync(async (req: Request, res: Response) => {
+    const { name } = req.body;
+
+    if (!name || name.trim().length < 2) {
+        throw new AppError('El nombre debe tener al menos 2 caracteres', 400);
+    }
+
+    const user = await prisma.user.update({
+        where: { id: req.user!.id },
+        data: { name: name.trim() },
+        select: { id: true, email: true, name: true }
+    });
+
+    res.json({
+        status: 'success',
+        message: 'Perfil actualizado correctamente',
+        data: { user }
+    });
+});
+
+// ============================================
+// DELETE ACCOUNT
+// ============================================
+
+export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
+    const { password } = req.body;
+
+    if (!password) {
+        throw new AppError('Debes confirmar tu contraseña para eliminar la cuenta', 400);
+    }
+
+    const user = await prisma.user.findUnique({ where: { id: req.user!.id } });
+    const isPasswordValid = await bcrypt.compare(password, user!.passwordHash);
+
+    if (!isPasswordValid) {
+        throw new AppError('Contraseña incorrecta', 401);
+    }
+
+    // Eliminar favoritos primero (cascada manual por si Prisma no la aplica)
+    await prisma.favorite.deleteMany({ where: { userId: req.user!.id } });
+    await prisma.user.delete({ where: { id: req.user!.id } });
+
+    res.json({
+        status: 'success',
+        message: 'Cuenta eliminada correctamente'
+    });
+});

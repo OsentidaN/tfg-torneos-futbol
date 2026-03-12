@@ -3,7 +3,9 @@ import {
     register,
     login,
     getMe,
-    updatePassword
+    updatePassword,
+    updateProfile,
+    deleteAccount
 } from '../controllers/auth.controller';
 import { protect } from '../middlewares/auth.middleware';
 
@@ -20,9 +22,11 @@ router.post('/login', login);
 // PROTECTED ROUTES
 // ============================================
 
-router.use(protect); // Todas las rutas después de esta línea requieren autenticación
+router.use(protect);
 
 router.get('/me', getMe);
 router.patch('/update-password', updatePassword);
+router.patch('/update-profile', updateProfile);
+router.delete('/delete-account', deleteAccount);
 
-export default router;
+export default router;

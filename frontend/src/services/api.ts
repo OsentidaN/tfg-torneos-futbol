@@ -62,4 +62,11 @@ export const getFavorites = () => api.get('/favorites');
 export const toggleFavorite = (data: { targetId: number; type: 'MATCH' | 'SEASON' }) =>
     api.post('/favorites/toggle', data);
 
+// --- USER PROFILE ---
+export const updateProfile = (data: { name: string }) => api.patch('/auth/update-profile', data);
+export const updatePassword = (data: { currentPassword: string; newPassword: string }) =>
+    api.patch('/auth/update-password', data);
+export const deleteAccount = (data: { password: string }) =>
+    api.delete('/auth/delete-account', { data });
+
 export default api;
