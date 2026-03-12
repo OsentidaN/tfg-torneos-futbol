@@ -12,6 +12,7 @@ import Comparar from './pages/Comparar';
 import Estadisticas from './pages/Estadisticas';
 import Login from './pages/Login';
 import Registro from './pages/Registro';
+import Favoritos from './pages/Favoritos';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/estadisticas" element={<Estadisticas />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
+        <Route path="/favoritos" element={<Favoritos />} />
       </Routes>
       <footer>
         <p>© 2026 TFG Torneos de Fútbol · Osentida Nguema Rodríguez · DAW</p>

@@ -5,6 +5,7 @@ import seasonsRoutes from './seasons.routes';
 import matchesRoutes from './matches.routes';
 import teamsRoutes from './teams.routes';
 import playersRoutes from './players.routes';
+import favoritesRoutes from './favorites.routes';
 
 const router = Router();
 
@@ -18,6 +19,7 @@ router.use('/seasons', seasonsRoutes);
 router.use('/matches', matchesRoutes);
 router.use('/teams', teamsRoutes);
 router.use('/players', playersRoutes);
+router.use('/favorites', favoritesRoutes);
 
 // ============================================
 // API INFO
@@ -33,7 +35,8 @@ router.get('/', (_req, res) => {
             seasons: '/api/seasons',
             matches: '/api/matches',
             teams: '/api/teams',
-            players: '/api/players'
+            players: '/api/players',
+            favorites: '/api/favorites'
         },
         documentation: 'https://github.com/tu-repo/api-docs'
     });

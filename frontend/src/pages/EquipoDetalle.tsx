@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { getTeamById, getTeamStats, getTeamMatches } from '../services/api';
+import { translateCountryName } from '../utils/formatters';
 
 export default function EquipoDetalle() {
     const { id } = useParams();
@@ -40,7 +41,7 @@ export default function EquipoDetalle() {
                     ? <img src={team.flagUrl} alt={team.name} style={{ width: 80, height: 57, objectFit: 'cover', borderRadius: 8, border: '2px solid var(--border)', boxShadow: 'var(--shadow-md)' }} />
                     : <div className="flag-placeholder" style={{ width: 80, height: 57, fontSize: '1.5rem' }}>?</div>}
                 <div>
-                    <h1 className="page-title" style={{ marginBottom: '0.25rem' }}>{team.name}</h1>
+                    <h1 className="page-title" style={{ marginBottom: '0.25rem' }}>{translateCountryName(team.name)}</h1>
                     <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                         {team.code && <span className="badge badge-blue">{team.code}</span>}
                         {team.confederation && <span className="badge badge-purple">{team.confederation}</span>}
@@ -110,7 +111,7 @@ export default function EquipoDetalle() {
                                 <div className="match-card">
                                     <div style={{ flex: 1, textAlign: 'right' }}>
                                         <div className="team-flag" style={{ justifyContent: 'flex-end' }}>
-                                            <span className="team-name" style={{ fontWeight: m.homeTeamId === Number(id) ? 700 : 400 }}>{m.homeTeam?.name}</span>
+                                            <span className="team-name" style={{ fontWeight: m.homeTeamId === Number(id) ? 700 : 400 }}>{translateCountryName(m.homeTeam?.name)}</span>
                                             {m.homeTeam?.flagUrl ? <img src={m.homeTeam.flagUrl} alt="" style={{ width: 24, height: 17 }} /> : <div className="flag-placeholder">?</div>}
                                         </div>
                                     </div>
@@ -118,7 +119,7 @@ export default function EquipoDetalle() {
                                     <div style={{ flex: 1 }}>
                                         <div className="team-flag">
                                             {m.awayTeam?.flagUrl ? <img src={m.awayTeam.flagUrl} alt="" style={{ width: 24, height: 17 }} /> : <div className="flag-placeholder">?</div>}
-                                            <span className="team-name" style={{ fontWeight: m.awayTeamId === Number(id) ? 700 : 400 }}>{m.awayTeam?.name}</span>
+                                            <span className="team-name" style={{ fontWeight: m.awayTeamId === Number(id) ? 700 : 400 }}>{translateCountryName(m.awayTeam?.name)}</span>
                                         </div>
                                     </div>
                                     <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textAlign: 'right' }}>

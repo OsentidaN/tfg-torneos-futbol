@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getTournaments, getMatches } from '../services/api';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrophy, faGlobe, faEarthEurope, faChartLine, faCodeCompare, faCalendarDays, faUsers } from '@fortawesome/free-solid-svg-icons';
 
 export default function Home() {
     const [tournaments, setTournaments] = useState<any[]>([]);
@@ -60,23 +62,22 @@ export default function Home() {
                         </div>
 
                         {/* Torneos Cards */}
-                        <p className="section-title">🏆 Torneos Disponibles</p>
-                        <div className="grid-2">
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginTop: '3rem', marginBottom: '2rem' }}>
+                            <FontAwesomeIcon icon={faTrophy} style={{ fontSize: '2rem', color: 'var(--accent-gold)' }} />
+                            <h2 style={{ fontFamily: 'Outfit', fontSize: '2rem', fontWeight: 800, margin: 0 }}>TORNEOS DISPONIBLES</h2>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'center', gap: '2.5rem', flexWrap: 'wrap' }}>
                             {tournaments.map((t: any) => (
-                                <Link to={`/torneos?tipo=${t.type}`} key={t.id} style={{ textDecoration: 'none' }}>
-                                    <div className="card card-link">
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                            <span style={{ fontSize: '2.5rem' }}>
-                                                {t.type === 'WORLD_CUP' ? '🌍' : '🇪🇺'}
-                                            </span>
-                                            <div>
-                                                <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>{t.name}</div>
-                                                <span className={`badge ${t.type === 'WORLD_CUP' ? 'badge-gold' : 'badge-blue'}`}>
-                                                    {t._count?.seasons} ediciones
-                                                </span>
-                                            </div>
+                                <Link to={`/torneos?tipo=${t.type}`} key={t.id} style={{ textDecoration: 'none', flex: '1 1 350px', maxWidth: '450px' }}>
+                                    <div className="card card-link" style={{ padding: '2.5rem', textAlign: 'center' }}>
+                                        <div style={{ fontSize: '4rem', marginBottom: '1rem', color: t.type === 'WORLD_CUP' ? 'var(--accent-gold)' : 'var(--accent)' }}>
+                                            <FontAwesomeIcon icon={t.type === 'WORLD_CUP' ? faGlobe : faEarthEurope} />
                                         </div>
-                                        <p style={{ marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                        <div style={{ fontWeight: 800, fontSize: '1.5rem', marginBottom: '0.5rem', fontFamily: 'Outfit' }}>{t.name}</div>
+                                        <span className={`badge ${t.type === 'WORLD_CUP' ? 'badge-gold' : 'badge-green'}`} style={{ fontSize: '0.9rem', padding: '0.4rem 0.8rem' }}>
+                                            {t._count?.seasons} ediciones
+                                        </span>
+                                        <p style={{ marginTop: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
                                             {t.type === 'WORLD_CUP'
                                                 ? 'El torneo de fútbol más importante del mundo, celebrado cada 4 años.'
                                                 : 'El campeonato continental de fútbol de la UEFA, celebrado cada 4 años.'}
@@ -87,22 +88,25 @@ export default function Home() {
                         </div>
 
                         {/* Quick Actions */}
-                        <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                        <div style={{ marginTop: '5rem', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                             {[
-                                { to: '/estadisticas', icon: '📊', label: 'Rankings', desc: 'Clasificaciones y tops' },
-                                { to: '/comparar', icon: '⚖️', label: 'Comparar equipos', desc: 'Enfrentamientos directos' },
-                                { to: '/partidos', icon: '📋', label: 'Todos los partidos', desc: 'Historial completo' },
-                                { to: '/equipos', icon: '🛡️', label: 'Equipos', desc: 'Todos los participantes' },
+                                { to: '/estadisticas', icon: faChartLine, label: 'Rankings', desc: 'Clasificaciones y tops' },
+                                { to: '/comparar', icon: faCodeCompare, label: 'Comparar equipos', desc: 'Enfrentamientos directos' },
+                                { to: '/partidos', icon: faCalendarDays, label: 'Todos los partidos', desc: 'Historial completo' },
+                                { to: '/equipos', icon: faUsers, label: 'Equipos', desc: 'Todos los participantes' },
                             ].map(item => (
-                                <Link to={item.to} key={item.label} style={{ textDecoration: 'none' }}>
-                                    <div className="card card-link" style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
-                                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{item.icon}</div>
-                                        <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{item.label}</div>
-                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{item.desc}</div>
+                                <Link to={item.to} key={item.label} style={{ textDecoration: 'none', flex: '1 1 210px', maxWidth: '260px' }}>
+                                    <div className="card card-link" style={{ textAlign: 'center', padding: '2rem 1.5rem' }}>
+                                        <div style={{ fontSize: '2.2rem', marginBottom: '0.75rem', color: 'var(--accent)' }}>
+                                            <FontAwesomeIcon icon={item.icon} />
+                                        </div>
+                                        <div style={{ fontWeight: 800, fontSize: '1.1rem', marginBottom: '0.25rem', fontFamily: 'Outfit' }}>{item.label}</div>
+                                        <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>{item.desc}</div>
                                     </div>
                                 </Link>
                             ))}
                         </div>
+
                     </>
                 )}
             </div>

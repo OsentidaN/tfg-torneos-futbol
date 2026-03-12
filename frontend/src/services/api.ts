@@ -57,4 +57,9 @@ export const getPlayerById = (id: number) => api.get(`/players/${id}`);
 export const getTopScorers = (params?: object) => api.get('/players/top-scorers', { params });
 export const getTopAssists = (params?: object) => api.get('/players/top-assists', { params });
 
+// --- FAVORITES ---
+export const getFavorites = () => api.get('/favorites');
+export const toggleFavorite = (data: { targetId: number; type: 'MATCH' | 'SEASON' }) =>
+    api.post('/favorites/toggle', data);
+
 export default api;

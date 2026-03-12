@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { translateCountryName } from './utils/formatters';
 
 interface Match {
     id: number;
@@ -7,6 +8,8 @@ interface Match {
     awayTeam: { name: string; flagUrl?: string };
     homeGoals?: number;
     awayGoals?: number;
+    homeGoalsPenalty?: number;
+    awayGoalsPenalty?: number;
     status: string;
     stage: string;
 }
@@ -35,63 +38,139 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
     }
 
     return (
-        <div className="bracket-container" style={{ display: 'flex', gap: '2rem', padding: '1rem', minWidth: 'max-content' }}>
+        <div className="bracket-container" style={{ display: 'flex', gap: '3rem', padding: '2rem', minWidth: 'max-content', justifyContent: 'center', alignItems: 'flex-start' }}>
             {stages.map(stage => {
                 const stageMatches = getMatchesByStage(stage);
                 if (stageMatches.length === 0 && stage !== 'FINAL') return null;
 
                 return (
-                    <div key={stage} className="bracket-column" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', gap: '1rem' }}>
-                        <p className="section-title" style={{ textAlign: 'center', marginBottom: '0.5rem', fontSize: '0.9rem' }}>
+                    <div key={stage} className="bracket-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '0 0 280px' }}>
+                        <p className="section-title" style={{ 
+                            textAlign: 'center', 
+                            marginBottom: '1rem', 
+                            fontSize: '1.1rem', 
+                            color: '#fff',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.1em',
+                            borderBottom: '2px solid var(--accent)',
+                            paddingBottom: '0.5rem'
+                        }}>
                             {STAGE_LABELS[stage]}
                         </p>
-                        {stageMatches.map(match => (
-                            <Link 
-                                to={`/partidos/${match.id}`} 
-                                state={returnState}
-                                key={match.id} 
-                                style={{ textDecoration: 'none' }}
-                            >
-                                <div className="match-card" style={{ width: '260px', padding: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.6rem' }}>
-                                    <div style={{ flex: 1, textAlign: 'right', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.4rem', minWidth: 0 }}>
-                                        <span style={{ 
-                                            fontSize: '0.8rem', 
-                                            fontWeight: match.status === 'FINISHED' && match.homeGoals! > match.awayGoals! ? 700 : 400,
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis'
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-around', height: '100%', gap: '1.5rem' }}>
+                            {stageMatches.map(match => {
+                                const isFinished = match.status === 'FINISHED';
+                                const homeGoals = match.homeGoals ?? 0;
+                                const awayGoals = match.awayGoals ?? 0;
+                                
+                                const homeWin = isFinished && homeGoals > awayGoals;
+                                const awayWin = isFinished && awayGoals > homeGoals;
+                                const isDraw = isFinished && homeGoals === awayGoals;
+                                
+                                const homePenaltyWin = isFinished && isDraw && (match.homeGoalsPenalty ?? 0) > (match.awayGoalsPenalty ?? 0);
+                                const awayPenaltyWin = isFinished && isDraw && (match.awayGoalsPenalty ?? 0) > (match.homeGoalsPenalty ?? 0);
+
+                                let homeColor = '#fff';
+                                let awayColor = '#fff';
+                                let homeWeight = 500;
+                                let awayWeight = 500;
+
+                                if (homeWin) {
+                                    homeColor = 'var(--accent-2)';
+                                    homeWeight = 800;
+                                    awayColor = 'var(--text-muted)';
+                                } else if (awayWin) {
+                                    awayColor = 'var(--accent-2)';
+                                    awayWeight = 800;
+                                    homeColor = 'var(--text-muted)';
+                                } else if (isDraw) {
+                                    if (homePenaltyWin) {
+                                        homeColor = '#fff';
+                                        homeWeight = 800;
+                                        awayColor = 'var(--text-muted)';
+                                    } else if (awayPenaltyWin) {
+                                        awayColor = '#fff';
+                                        awayWeight = 800;
+                                        homeColor = 'var(--text-muted)';
+                                    }
+                                }
+
+                                return (
+                                    <Link 
+                                        to={`/partidos/${match.id}`} 
+                                        state={returnState}
+                                        key={match.id} 
+                                        style={{ textDecoration: 'none' }}
+                                    >
+                                        <div className="match-card" style={{ 
+                                            width: '280px', 
+                                            padding: '1rem', 
+                                            display: 'flex', 
+                                            flexDirection: 'column',
+                                            gap: '0.8rem',
+                                            background: 'rgba(22, 33, 24, 0.6)',
+                                            border: '1px solid var(--border-accent)',
+                                            borderRadius: '10px'
                                         }}>
-                                            {match.homeTeam.name}
-                                        </span>
-                                        {match.homeTeam.flagUrl && <img src={match.homeTeam.flagUrl} alt="" style={{ width: 16, height: 11, borderRadius: '1px' }} />}
-                                        <span style={{ fontWeight: 800, color: 'var(--accent)' }}>
-                                            {match.status === 'FINISHED' ? match.homeGoals : '-'}
-                                        </span>
-                                    </div>
-                                    
-                                    <span style={{ opacity: 0.3, fontWeight: 300 }}>-</span>
-                                    
-                                    <div style={{ flex: 1, textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.4rem', minWidth: 0 }}>
-                                        <span style={{ fontWeight: 800, color: 'var(--accent)' }}>
-                                            {match.status === 'FINISHED' ? match.awayGoals : '-'}
-                                        </span>
-                                        {match.awayTeam.flagUrl && <img src={match.awayTeam.flagUrl} alt="" style={{ width: 16, height: 11, borderRadius: '1px' }} />}
-                                        <span style={{ 
-                                            fontSize: '0.8rem', 
-                                            fontWeight: match.status === 'FINISHED' && match.awayGoals! > match.homeGoals! ? 700 : 400,
-                                            whiteSpace: 'nowrap',
-                                            overflow: 'hidden',
-                                            textOverflow: 'ellipsis'
-                                        }}>
-                                            {match.awayTeam.name}
-                                        </span>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
+                                            {/* Home Team */}
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
+                                                    {match.homeTeam.flagUrl && <img src={match.homeTeam.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: '2px' }} />}
+                                                    <span style={{ 
+                                                        fontSize: '0.95rem', 
+                                                        fontWeight: homeWeight,
+                                                        color: homeColor,
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis'
+                                                    }}>
+                                                        {translateCountryName(match.homeTeam.name)}
+                                                    </span>
+                                                </div>
+                                                <span style={{ 
+                                                    fontWeight: 900, 
+                                                    fontSize: '1.2rem',
+                                                    color: '#fff'
+                                                }}>
+                                                    {isFinished ? match.homeGoals : '-'}
+                                                </span>
+                                            </div>
+                                            
+                                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
+                                            
+                                            {/* Away Team */}
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
+                                                    {match.awayTeam.flagUrl && <img src={match.awayTeam.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: '2px' }} />}
+                                                    <span style={{ 
+                                                        fontSize: '0.95rem', 
+                                                        fontWeight: awayWeight,
+                                                        color: awayColor,
+                                                        whiteSpace: 'nowrap',
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis'
+                                                    }}>
+                                                        {translateCountryName(match.awayTeam.name)}
+                                                    </span>
+                                                </div>
+                                                <span style={{ 
+                                                    fontWeight: 900, 
+                                                    fontSize: '1.2rem',
+                                                    color: '#fff'
+                                                }}>
+                                                    {isFinished ? match.awayGoals : '-'}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                );
+                            })}
+                        </div>
                     </div>
                 );
             })}
         </div>
     );
 };
+
+

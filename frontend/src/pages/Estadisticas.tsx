@@ -10,13 +10,22 @@ import {
     getTeamStats 
 } from '../services/api';
 import { Link } from 'react-router-dom';
-import { formatPlayerName } from '../utils/formatters';
+import { formatPlayerName, translateCountryName } from '../utils/formatters';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+    faChartBar, faTrophy, faSearch, faLightbulb,
+    faGlobe, faEarthEurope, faShieldHalved, faCalendarDays,
+    faFutbol, faSquare, faStar, faBolt, faHandshake
+} from '@fortawesome/free-solid-svg-icons';
+
+type ActiveTab = 'ranking' | 'detalle' | 'curiosos';
 
 export default function Estadisticas() {
     const [tournaments, setTournaments] = useState<any[]>([]);
     const [selectedTournamentId, setSelectedTournamentId] = useState<number | null>(null);
     const [winners, setWinners] = useState<any[]>([]);
     const [topScorers, setTopScorers] = useState<any[]>([]);
+    const [activeTab, setActiveTab] = useState<ActiveTab>('ranking');
     
     // Recovery states
     const [summary, setSummary] = useState<any>(null);
@@ -30,7 +39,6 @@ export default function Estadisticas() {
     const [loadingDetail, setLoadingDetail] = useState(false);
     const [loadingRanking, setLoadingRanking] = useState(false);
 
-    // Initial load: Torneos and Dashboard Summary
     useEffect(() => {
         const loadInitialData = async () => {
             try {
@@ -38,7 +46,6 @@ export default function Estadisticas() {
                 const allTorneos = torneosRes.data.data;
                 setTournaments(allTorneos);
 
-                // Dashboard Summary aggregation
                 const statsPromises = allTorneos.map((t: any) => getTournamentStats(t.id));
                 const allStats = await Promise.all(statsPromises);
                 
@@ -54,10 +61,8 @@ export default function Estadisticas() {
                 setSummary({
                     ...totalSummary,
                     equipos: teamsRes.data.total || teamsRes.data.results || 0,
-                    golesPromedio: totalSummary.partidos > 0 ? (totalSummary.goles / totalSummary.partidos).toFixed(2) : '0'
                 });
 
-                // Interesting Facts (simulated from tournament types)
                 const wc = allTorneos.filter((t: any) => t.type === 'WORLD_CUP')[0];
                 const ec = allTorneos.filter((t: any) => t.type === 'EURO_CUP')[0];
 
@@ -71,36 +76,11 @@ export default function Estadisticas() {
                     
                     const facts: any[] = [
                         { type: 'total_goals', titulo: 'Goles Totales', descripcion: `${allStats.find(s => s.data.data.tournament.id === wc.id)?.data.data.stats.totalGoals}`, detalle: 'En toda la historia' },
-                        { type: 'highest_scoring', titulo: 'Último Campeón', descripcion: `${lastWinner?.winner?.name || 'N/A'}`, detalle: `Ganó en ${lastWinner?.year || ''}` }
+                        { type: 'highest_scoring', titulo: 'Último Campeón', descripcion: `${translateCountryName(lastWinner?.winner?.name) || 'N/A'}`, detalle: `Ganó en ${lastWinner?.year || ''}` }
                     ];
-
-                    if (recs.biggestWin) {
-                        facts.push({ 
-                            type: 'biggest_win', 
-                            titulo: 'Mayor Goleada', 
-                            descripcion: recs.biggestWin.score, 
-                            detalle: `${recs.biggestWin.homeTeam} vs ${recs.biggestWin.awayTeam}`,
-                            torneo: 'Mundial', anio: recs.biggestWin.year 
-                        });
-                    }
-                    if (recs.highestScoringSeason) {
-                        facts.push({ 
-                            type: 'total_goals', 
-                            titulo: 'Torneo con más Goles', 
-                            descripcion: `${recs.highestScoringSeason.goals} goles`, 
-                            detalle: `Récord en una edición`,
-                            torneo: 'Mundial', anio: recs.highestScoringSeason.year 
-                        });
-                    }
-                    if (recs.mostCardsSeason) {
-                        facts.push({ 
-                            type: 'most_cards', 
-                            titulo: 'Torneo con más Tarjetas', 
-                            descripcion: `${recs.mostCardsSeason.cards} tarjetas`, 
-                            detalle: `Récord de sanciones`,
-                            torneo: 'Mundial', anio: recs.mostCardsSeason.year 
-                        });
-                    }
+                    if (recs.biggestWin) facts.push({ type: 'biggest_win', titulo: 'Mayor Goleada', descripcion: recs.biggestWin.score, detalle: `${translateCountryName(recs.biggestWin.homeTeam)} vs ${translateCountryName(recs.biggestWin.awayTeam)}`, torneo: 'Mundial', anio: recs.biggestWin.year });
+                    if (recs.highestScoringSeason) facts.push({ type: 'total_goals', titulo: 'Torneo con más Goles', descripcion: `${recs.highestScoringSeason.goals} goles`, detalle: `Récord en una edición`, torneo: 'Mundial', anio: recs.highestScoringSeason.year });
+                    if (recs.mostCardsSeason) facts.push({ type: 'most_cards', titulo: 'Torneo con más Tarjetas', descripcion: `${recs.mostCardsSeason.cards} tarjetas`, detalle: `Récord de sanciones`, torneo: 'Mundial', anio: recs.mostCardsSeason.year });
                     setFactsWC(facts);
                 }
 
@@ -114,36 +94,11 @@ export default function Estadisticas() {
 
                     const facts: any[] = [
                         { type: 'total_goals', titulo: 'Goles Totales', descripcion: `${allStats.find(s => s.data.data.tournament.id === ec.id)?.data.data.stats.totalGoals}`, detalle: 'En toda la historia' },
-                        { type: 'highest_scoring', titulo: 'Último Campeón', descripcion: `${lastWinner?.winner?.name || 'N/A'}`, detalle: `Ganó en ${lastWinner?.year || ''}` }
+                        { type: 'highest_scoring', titulo: 'Último Campeón', descripcion: `${translateCountryName(lastWinner?.winner?.name) || 'N/A'}`, detalle: `Ganó en ${lastWinner?.year || ''}` }
                     ];
-
-                    if (recs.biggestWin) {
-                        facts.push({ 
-                            type: 'biggest_win', 
-                            titulo: 'Mayor Goleada', 
-                            descripcion: recs.biggestWin.score, 
-                            detalle: `${recs.biggestWin.homeTeam} vs ${recs.biggestWin.awayTeam}`,
-                            torneo: 'Eurocopa', anio: recs.biggestWin.year 
-                        });
-                    }
-                    if (recs.highestScoringSeason) {
-                        facts.push({ 
-                            type: 'total_goals', 
-                            titulo: 'Torneo con más Goles', 
-                            descripcion: `${recs.highestScoringSeason.goals} goles`, 
-                            detalle: `Récord en una edición`,
-                            torneo: 'Eurocopa', anio: recs.highestScoringSeason.year 
-                        });
-                    }
-                    if (recs.mostCardsSeason) {
-                        facts.push({ 
-                            type: 'most_cards', 
-                            titulo: 'Torneo con más Tarjetas', 
-                            descripcion: `${recs.mostCardsSeason.cards} tarjetas`, 
-                            detalle: `Récord de sanciones`,
-                            torneo: 'Eurocopa', anio: recs.mostCardsSeason.year 
-                        });
-                    }
+                    if (recs.biggestWin) facts.push({ type: 'biggest_win', titulo: 'Mayor Goleada', descripcion: recs.biggestWin.score, detalle: `${translateCountryName(recs.biggestWin.homeTeam)} vs ${translateCountryName(recs.biggestWin.awayTeam)}`, torneo: 'Eurocopa', anio: recs.biggestWin.year });
+                    if (recs.highestScoringSeason) facts.push({ type: 'total_goals', titulo: 'Torneo con más Goles', descripcion: `${recs.highestScoringSeason.goals} goles`, detalle: `Récord en una edición`, torneo: 'Eurocopa', anio: recs.highestScoringSeason.year });
+                    if (recs.mostCardsSeason) facts.push({ type: 'most_cards', titulo: 'Torneo con más Tarjetas', descripcion: `${recs.mostCardsSeason.cards} tarjetas`, detalle: `Récord de sanciones`, torneo: 'Eurocopa', anio: recs.mostCardsSeason.year });
                     setFactsEC(facts);
                 }
 
@@ -153,37 +108,25 @@ export default function Estadisticas() {
                 setLoadingMain(false);
             }
         };
-
         loadInitialData();
     }, []);
 
-    // Fetch Top Teams Ranking
     const fetchTopTeams = async (type: string) => {
-        if (!type) {
-            setTopTeams([]);
-            return;
-        }
+        if (!type) { setTopTeams([]); return; }
         setLoadingRanking(true);
         try {
-            // Obtenemos equipos y filtramos por los que tienen más partidos/historia (limitado para rendimiento)
             const teamsRes = await getTeams({ limit: 100 });
             const allTeams = teamsRes.data.data;
-            
-            // Obtenemos stats de cada equipo (en paralelo) filtrando por tipo si se especifica
             const statsPromises = allTeams.map((team: any) => 
                 getTeamStats(team.id, type ? { type } : {}).then(res => ({
                     ...team,
                     stats: res.data.data.stats
                 })).catch(() => null)
             );
-            
             const teamsWithStats = (await Promise.all(statsPromises)).filter(Boolean);
-            
-            // Ordenar por porcentaje de victorias
             const sorted = (teamsWithStats as any[])
                 .sort((a, b) => b.stats.winPercentage - a.stats.winPercentage)
                 .slice(0, 15);
-                
             setTopTeams(sorted);
         } catch (error) {
             console.error("Error fetching ranking:", error);
@@ -192,7 +135,6 @@ export default function Estadisticas() {
         }
     };
 
-    // Load detail when a tournament is selected
     useEffect(() => {
         if (!selectedTournamentId) return;
         setLoadingDetail(true);
@@ -211,45 +153,125 @@ export default function Estadisticas() {
 
     const selectedTournament = tournaments.find(t => t.id === selectedTournamentId);
 
-    const FACT_ICONS: Record<string, string> = {
-        highest_scoring: '🥅', most_participations: '🌟', total_goals: '⚽', biggest_win: '💪', most_cards: '🟨'
+    const FACT_ICONS: Record<string, any> = {
+        highest_scoring: faStar,
+        most_participations: faStar,
+        total_goals: faFutbol,
+        biggest_win: faBolt,
+        most_cards: faSquare
     };
 
     const FactCard = ({ f }: { f: any }) => (
-        <div style={{ padding: '2rem 1.5rem', background: 'var(--bg-glass)', borderRadius: 'var(--radius-lg)', marginBottom: '1.5rem', border: '1px solid var(--border)', textAlign: 'center', boxShadow: 'var(--shadow-md)' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '1rem', display: 'flex', justifyContent: 'center' }}>{FACT_ICONS[f.type] || '📌'}</div>
-            <div style={{ fontWeight: 600, fontSize: '1.1rem', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>{f.titulo}</div>
-            <div style={{ fontSize: '1.3rem', color: 'var(--text-primary)', fontWeight: 800, fontFamily: 'Outfit' }}>{f.descripcion}</div>
-            {f.detalle && <div style={{ fontSize: '1rem', color: 'var(--accent)', marginTop: '0.5rem', fontWeight: 600 }}>{f.detalle}</div>}
-            {f.torneo && <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>📅 {f.torneo} {f.anio}</div>}
+        <div style={{ 
+            padding: '2rem 1.5rem', 
+            background: 'rgba(22, 33, 24, 0.6)', 
+            borderRadius: 'var(--radius-lg)', 
+            marginBottom: '1.5rem', 
+            border: '1px solid var(--border-accent)', 
+            textAlign: 'center', 
+            boxShadow: 'var(--shadow-md)',
+            transition: 'transform 0.2s ease'
+        }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '1rem', display: 'flex', justifyContent: 'center', color: 'var(--accent)' }}>
+                <FontAwesomeIcon icon={FACT_ICONS[f.type] || faLightbulb} />
+            </div>
+            <div style={{ fontWeight: 600, fontSize: '1rem', marginBottom: '0.5rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{f.titulo}</div>
+            <div style={{ fontSize: '1.5rem', color: 'var(--text-primary)', fontWeight: 800, fontFamily: 'Outfit' }}>{f.descripcion}</div>
+            {f.detalle && <div style={{ fontSize: '0.95rem', color: 'var(--accent)', marginTop: '0.5rem', fontWeight: 600 }}>{f.detalle}</div>}
+            {f.torneo && <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.4rem' }}>
+                <FontAwesomeIcon icon={faCalendarDays} style={{ marginRight: '0.3rem' }} />{f.torneo} {f.anio}
+            </div>}
         </div>
     );
 
     if (loadingMain) return <div className="container page"><div className="loading-state"><div className="spinner" /></div></div>;
 
-    const maxTeamGoals = Math.max(...topTeams.map((t: any) => t.stats.winPercentage || 0), 1);
+    const maxWinPct = Math.max(...topTeams.map((t: any) => t.stats.winPercentage || 0), 1);
+
+    // Tab definitions
+    const tabs = [
+        { key: 'ranking' as ActiveTab, label: 'Ranking de Equipos', icon: faTrophy },
+        { key: 'detalle' as ActiveTab, label: 'Detalle por Torneo', icon: faSearch },
+        { key: 'curiosos' as ActiveTab, label: 'Datos Curiosos', icon: faLightbulb },
+    ];
 
     return (
         <div className="container page">
-            <h1 className="page-title">📊 Estadísticas</h1>
-            <p className="page-subtitle">Análisis histórico de todos los torneos</p>
+            {/* Premium Header */}
+            <div style={{ marginBottom: '3rem' }}>
+                <h1 className="page-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+                    <FontAwesomeIcon icon={faChartBar} style={{ color: 'var(--accent)' }} />
+                    Estadísticas
+                </h1>
+                <p className="page-subtitle" style={{ fontSize: '1.2rem', opacity: 0.8 }}>
+                    Análisis histórico de todos los torneos
+                </p>
+            </div>
 
             {/* Dashboard Summary */}
             {summary && (
                 <div className="grid-4" style={{ marginBottom: '3rem' }}>
-                    <div className="stat-box"><div className="value">{summary.equipos}</div><div className="label">🛡️ Equipos</div></div>
-                    <div className="stat-box"><div className="value">{summary.ediciones}</div><div className="label">📅 Ediciones</div></div>
-                    <div className="stat-box"><div className="value">{summary.partidos.toLocaleString()}</div><div className="label">⚽ Partidos</div></div>
-                    <div className="stat-box"><div className="value">{summary.goles.toLocaleString()}</div><div className="label">🥅 Goles</div></div>
+                    <div className="stat-box">
+                        <div className="value" style={{ display: 'flex', justifyContent: 'center', fontSize: '2rem' }}>
+                            <FontAwesomeIcon icon={faShieldHalved} style={{ color: 'var(--accent)' }} />
+                        </div>
+                        <div className="value" style={{ marginTop: '0.5rem' }}>{summary.equipos}</div>
+                        <div className="label">Equipos</div>
+                    </div>
+                    <div className="stat-box">
+                        <div className="value" style={{ display: 'flex', justifyContent: 'center', fontSize: '2rem' }}>
+                            <FontAwesomeIcon icon={faCalendarDays} style={{ color: 'var(--accent)' }} />
+                        </div>
+                        <div className="value" style={{ marginTop: '0.5rem' }}>{summary.ediciones}</div>
+                        <div className="label">Ediciones</div>
+                    </div>
+                    <div className="stat-box">
+                        <div className="value" style={{ display: 'flex', justifyContent: 'center', fontSize: '2rem' }}>
+                            <FontAwesomeIcon icon={faHandshake} style={{ color: 'var(--accent)' }} />
+                        </div>
+                        <div className="value" style={{ marginTop: '0.5rem' }}>{summary.partidos.toLocaleString()}</div>
+                        <div className="label">Partidos</div>
+                    </div>
+                    <div className="stat-box">
+                        <div className="value" style={{ display: 'flex', justifyContent: 'center', fontSize: '2rem' }}>
+                            <FontAwesomeIcon icon={faFutbol} style={{ color: 'var(--accent)' }} />
+                        </div>
+                        <div className="value" style={{ marginTop: '0.5rem' }}>{summary.goles.toLocaleString()}</div>
+                        <div className="label">Goles</div>
+                    </div>
                 </div>
             )}
 
-            <div className="grid-2" style={{ marginBottom: '3rem', alignItems: 'start' }}>
-                {/* Ranking de Equipos */}
-                <div className="card">
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                        <p className="section-title" style={{ marginBottom: 0 }}>🏆 Ranking de Equipos</p>
-                        <select className="select" style={{ width: 'auto', fontSize: '0.8rem' }}
+            {/* Tab navigation */}
+            <div className="tabs" style={{ justifyContent: 'center', marginBottom: '3rem', gap: '0.5rem', borderBottom: 'none' }}>
+                {tabs.map(tab => (
+                    <button
+                        key={tab.key}
+                        className={`tab-btn ${activeTab === tab.key ? 'active' : ''}`}
+                        style={{ 
+                            padding: '1rem 2rem', 
+                            fontSize: '1.05rem', 
+                            borderRadius: '12px', 
+                            border: activeTab === tab.key ? '1px solid var(--accent)' : '1px solid transparent',
+                            display: 'flex', alignItems: 'center', gap: '0.6rem'
+                        }}
+                        onClick={() => setActiveTab(tab.key)}
+                    >
+                        <FontAwesomeIcon icon={tab.icon} />
+                        {tab.label}
+                    </button>
+                ))}
+            </div>
+
+            {/* ── TAB: Ranking de Equipos ── */}
+            {activeTab === 'ranking' && (
+                <div className="card" style={{ padding: '2.5rem', background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', maxWidth: '800px', margin: '0 auto', animation: 'fadeIn 0.4s ease' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
+                        <p className="section-title" style={{ marginBottom: 0, fontSize: '1.3rem' }}>
+                            <FontAwesomeIcon icon={faTrophy} style={{ marginRight: '0.6rem', color: 'var(--accent-gold)' }} />
+                            Ranking de Efectividad
+                        </p>
+                        <select className="select" style={{ width: 'auto', fontSize: '0.9rem', padding: '0.6rem 1rem' }}
                             value={topType}
                             onChange={e => { setTopType(e.target.value); fetchTopTeams(e.target.value); }}>
                             <option value="">Seleccione un campeonato...</option>
@@ -261,162 +283,192 @@ export default function Estadisticas() {
                     {loadingRanking ? (
                         <div className="loading-state"><div className="spinner" /></div>
                     ) : !topType ? (
-                        <div className="empty-state" style={{ padding: '2rem' }}>
-                            <span className="empty-icon" style={{ fontSize: '2rem' }}>🏆</span>
-                            <p style={{ fontSize: '0.9rem' }}>Seleccione el histórico para ver el ranking de efectividad.</p>
+                        <div className="empty-state" style={{ padding: '3rem' }}>
+                            <FontAwesomeIcon icon={faTrophy} style={{ fontSize: '3rem', color: 'var(--text-muted)', marginBottom: '1rem' }} />
+                            <p>Selecciona un campeonato para ver el ranking de efectividad.</p>
                         </div>
                     ) : (
                         topTeams.map((team: any, i: number) => (
-                            <div key={team.id} style={{ marginBottom: '0.85rem' }}>
+                            <div key={team.id} style={{ marginBottom: '1rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.3rem' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                        <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 20, fontSize: '0.85rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                        <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 24, fontSize: '1rem' }}>
                                             {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
                                         </span>
                                         <Link to={`/equipos/${team.id}`} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            {team.flagUrl ? <img src={team.flagUrl} alt="" style={{ width: 24, height: 17, borderRadius: 2 }} /> : null}
-                                            <span style={{ fontWeight: 500, fontSize: '0.875rem' }}>{team.name}</span>
+                                            {team.flagUrl ? <img src={team.flagUrl} alt="" style={{ width: 28, height: 19, borderRadius: 3 }} /> : null}
+                                            <span style={{ fontWeight: 600, fontSize: '1rem' }}>{translateCountryName(team.name)}</span>
                                         </Link>
                                     </div>
-                                    <span style={{ fontWeight: 700, color: 'var(--accent)', fontSize: '0.875rem' }}>
+                                    <span style={{ fontWeight: 800, color: 'var(--accent)', fontSize: '1.1rem' }}>
                                         {team.stats.winPercentage}%
                                     </span>
                                 </div>
                                 <div className="progress-bar">
-                                    <div className="progress-fill" style={{ width: `${(team.stats.winPercentage / maxTeamGoals) * 100}%` }} />
+                                    <div className="progress-fill" style={{ width: `${(team.stats.winPercentage / maxWinPct) * 100}%` }} />
                                 </div>
-                                <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
                                     {team.stats.wins}V · {team.stats.draws}E · {team.stats.losses}D · {team.stats.titles} Títulos
                                 </div>
                             </div>
                         ))
                     )}
                 </div>
+            )}
 
-                {/* Selector de torneo para detalles específicos */}
-                <div className="card">
-                    <p className="section-title" style={{ marginBottom: '1rem' }}>🔎 Detalle por Torneo</p>
-                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                        {tournaments.map((t: any) => (
-                            <button
-                                key={t.id}
-                                className={`btn ${selectedTournamentId === t.id ? 'btn-primary' : 'btn-secondary'}`}
-                                onClick={() => setSelectedTournamentId(t.id)}
-                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem' }}
-                            >
-                                {t.type === 'WORLD_CUP' ? '🌍' : '🇪🇺'} {t.name}
-                            </button>
-                        ))}
+            {/* ── TAB: Detalle por Torneo ── */}
+            {activeTab === 'detalle' && (
+                <div style={{ animation: 'fadeIn 0.4s ease' }}>
+                    <div className="card" style={{ padding: '2.5rem', background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', marginBottom: '2rem' }}>
+                        <p className="section-title" style={{ marginBottom: '1.5rem', fontSize: '1.3rem' }}>
+                            <FontAwesomeIcon icon={faSearch} style={{ marginRight: '0.6rem' }} />
+                            Selecciona un Torneo
+                        </p>
+                        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                            {tournaments.map((t: any) => (
+                                <button
+                                    key={t.id}
+                                    className={`btn ${selectedTournamentId === t.id ? 'btn-primary' : 'btn-secondary'}`}
+                                    onClick={() => setSelectedTournamentId(t.id)}
+                                    style={{ padding: '0.6rem 1.25rem', fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}
+                                >
+                                    <FontAwesomeIcon icon={t.type === 'WORLD_CUP' ? faGlobe : faEarthEurope} />
+                                    {t.name}
+                                </button>
+                            ))}
+                        </div>
                     </div>
-                    {selectedTournamentId && !loadingDetail && (
-                         <div style={{ marginTop: '1.5rem' }}>
-                            <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>
-                                Viendo datos de: <strong>{selectedTournament?.name}</strong>
-                            </p>
-                         </div>
-                    )}
-                </div>
-            </div>
 
-            {/* Stats del torneo seleccionado */}
-            {selectedTournamentId && (
-                loadingDetail ? (
-                    <div className="loading-state"><div className="spinner" /></div>
-                ) : (
-                    <>
-                        <div className="grid-3" style={{ marginBottom: '3rem', alignItems: 'start' }}>
-                            {/* Goleadores */}
-                            <div className="card">
-                                <p className="section-title">⚽ Top Goleadores</p>
-                                {topScorers.length === 0 ? (
-                                    <div className="empty-state" style={{ padding: '1.5rem' }}>
-                                        <span className="empty-icon">⚽</span><p>Sin datos</p>
-                                    </div>
-                                ) : topScorers.map((s: any, i: number) => (
-                                    <div key={s.player?.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                            <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 20, fontSize: '0.85rem' }}>
-                                                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
-                                            </span>
-                                            <div>
-                                                <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{formatPlayerName(s.player?.firstName, s.player?.lastName)}</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{s.player?.team?.name}</div>
-                                            </div>
+                    {selectedTournamentId && (
+                        loadingDetail ? (
+                            <div className="loading-state"><div className="spinner" /></div>
+                        ) : (
+                            <div className="grid-3" style={{ alignItems: 'start', animation: 'fadeIn 0.4s ease' }}>
+                                {/* Goleadores */}
+                                <div className="card" style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)' }}>
+                                    <p className="section-title">
+                                        <FontAwesomeIcon icon={faFutbol} style={{ marginRight: '0.5rem', color: 'var(--accent)' }} />
+                                        Top Goleadores
+                                    </p>
+                                    {topScorers.length === 0 ? (
+                                        <div className="empty-state" style={{ padding: '1.5rem' }}>
+                                            <FontAwesomeIcon icon={faFutbol} style={{ fontSize: '2rem', marginBottom: '0.5rem' }} />
+                                            <p>Sin datos</p>
                                         </div>
-                                        <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{s.goals} ⚽</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Selecciones Goleadoras */}
-                            <div className="card">
-                                <p className="section-title">🛡️ Selecciones Goleadoras</p>
-                                {teamGoals.length === 0 ? (
-                                    <div className="empty-state" style={{ padding: '1.5rem' }}>
-                                        <span className="empty-icon">🛡️</span><p>Sin datos</p>
-                                    </div>
-                                ) : teamGoals.slice(0, 10).map((tg: any, i: number) => (
-                                    <div key={tg.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                                            <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 20, fontSize: '0.85rem' }}>
-                                                {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
-                                            </span>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                {tg.flagUrl && <img src={tg.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: 2 }} />}
-                                                <Link to={`/equipos/${tg.id}`} style={{ fontWeight: 500, fontSize: '0.875rem' }}>{tg.name}</Link>
+                                    ) : topScorers.map((s: any, i: number) => (
+                                        <div key={s.player?.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                                <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 20 }}>
+                                                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                                                </span>
+                                                <div>
+                                                    <div style={{ fontWeight: 500, fontSize: '0.875rem' }}>{formatPlayerName(s.player?.firstName, s.player?.lastName)}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{translateCountryName(s.player?.team?.name)}</div>
+                                                </div>
                                             </div>
-                                        </div>
-                                        <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{tg.goals} 🥅</span>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Campeones históricos */}
-                            <div className="card">
-                                <p className="section-title">🏆 Campeones – {selectedTournament?.name}</p>
-                                <div style={{ maxHeight: '430px', overflowY: 'auto' }}>
-                                    {winners.map((w: any) => (
-                                        <div key={w.year} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid var(--border)' }}>
-                                            <span style={{ fontWeight: 700 }}>{w.year}</span>
-                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                                {w.winner?.flagUrl && <img src={w.winner.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: 2 }} />}
-                                                <Link to={`/equipos/${w.winner?.id}`} style={{ fontWeight: 600 }}>{w.winner?.name}</Link>
-                                            </div>
-                                            <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{w.result.regular}</span>
+                                            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{s.goals} <FontAwesomeIcon icon={faFutbol} /></span>
                                         </div>
                                     ))}
                                 </div>
+
+                                {/* Selecciones Goleadoras */}
+                                <div className="card" style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)' }}>
+                                    <p className="section-title">
+                                        <FontAwesomeIcon icon={faShieldHalved} style={{ marginRight: '0.5rem', color: 'var(--accent)' }} />
+                                        Selecciones Goleadoras
+                                    </p>
+                                    {teamGoals.length === 0 ? (
+                                        <div className="empty-state" style={{ padding: '1.5rem' }}>
+                                            <FontAwesomeIcon icon={faShieldHalved} style={{ fontSize: '2rem', marginBottom: '0.5rem' }} />
+                                            <p>Sin datos</p>
+                                        </div>
+                                    ) : teamGoals.slice(0, 10).map((tg: any, i: number) => (
+                                        <div key={tg.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                                                <span style={{ color: i < 3 ? 'var(--accent-gold)' : 'var(--text-muted)', fontWeight: 700, minWidth: 20 }}>
+                                                    {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `#${i + 1}`}
+                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    {tg.flagUrl && <img src={tg.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: 2 }} />}
+                                                    <Link to={`/equipos/${tg.id}`} style={{ fontWeight: 500, fontSize: '0.875rem' }}>{translateCountryName(tg.name)}</Link>
+                                                </div>
+                                            </div>
+                                            <span style={{ fontWeight: 700, color: 'var(--accent)' }}>{tg.goals} <FontAwesomeIcon icon={faFutbol} /></span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Campeones históricos */}
+                                <div className="card" style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)' }}>
+                                    <p className="section-title">
+                                        <FontAwesomeIcon icon={faTrophy} style={{ marginRight: '0.5rem', color: 'var(--accent-gold)' }} />
+                                        Campeones – {selectedTournament?.name}
+                                    </p>
+                                    <div style={{ maxHeight: '430px', overflowY: 'auto' }}>
+                                        {winners.map((w: any) => (
+                                            <div key={w.year} style={{ display: 'flex', justifyContent: 'space-between', padding: '0.6rem 0', borderBottom: '1px solid var(--border)' }}>
+                                                <span style={{ fontWeight: 700 }}>{w.year}</span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                    {w.winner?.flagUrl && <img src={w.winner.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: 2 }} />}
+                                                    <Link to={`/equipos/${w.winner?.id}`} style={{ fontWeight: 600 }}>{translateCountryName(w.winner?.name)}</Link>
+                                                </div>
+                                                <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{w.result.regular}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
                             </div>
+                        )
+                    )}
+
+                    {!selectedTournamentId && (
+                        <div className="empty-state" style={{ padding: '3rem' }}>
+                            <FontAwesomeIcon icon={faSearch} style={{ fontSize: '3rem', color: 'var(--text-muted)', marginBottom: '1rem' }} />
+                            <p>Selecciona un torneo arriba para ver sus estadísticas detalladas.</p>
                         </div>
-                    </>
-                )
+                    )}
+                </div>
             )}
 
-            {/* Datos Curiosos Históricos */}
-            <div className="card" style={{ marginBottom: '4rem', padding: '3rem 2rem' }}>
-                <p className="section-title" style={{ textAlign: 'center', justifyContent: 'center', fontSize: '1.5rem', marginBottom: '3rem' }}>💡 Datos Curiosos Históricos</p>
-                <div className="grid-2" style={{ gap: '3rem' }}>
-                    {/* Columna Mundial */}
-                    <div>
-                        <h3 style={{ textAlign: 'center', marginBottom: '2rem', color: 'var(--accent-gold)', fontSize: '1.6rem', fontFamily: 'Outfit' }}>🌍 Copa Mundial</h3>
-                        {factsWC.length > 0 ? factsWC.map((f: any, i: number) => <FactCard key={`wc-${i}`} f={f} />) : <div className="empty-state">No hay datos</div>}
-                    </div>
-
-                    {/* Columna Eurocopa */}
-                    <div>
-                        <h3 style={{ textAlign: 'center', marginBottom: '2rem', color: '#58a6ff', fontSize: '1.6rem', fontFamily: 'Outfit' }}>🇪🇺 Eurocopa</h3>
-                        {factsEC.length > 0 ? factsEC.map((f: any, i: number) => <FactCard key={`ec-${i}`} f={f} />) : <div className="empty-state">No hay datos</div>}
+            {/* ── TAB: Datos Curiosos ── */}
+            {activeTab === 'curiosos' && (
+                <div style={{ animation: 'fadeIn 0.4s ease' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '3rem' }}>
+                        <div>
+                            <h3 style={{ 
+                                textAlign: 'center', marginBottom: '2rem', 
+                                color: 'var(--accent-gold)', fontSize: '1.6rem', 
+                                fontFamily: 'Outfit', display: 'flex', alignItems: 'center', 
+                                justifyContent: 'center', gap: '0.75rem' 
+                            }}>
+                                <FontAwesomeIcon icon={faGlobe} /> Copa Mundial
+                            </h3>
+                            {factsWC.length > 0 ? factsWC.map((f: any, i: number) => <FactCard key={`wc-${i}`} f={f} />) : <div className="empty-state">No hay datos</div>}
+                        </div>
+                        <div>
+                            <h3 style={{ 
+                                textAlign: 'center', marginBottom: '2rem', 
+                                color: '#58a6ff', fontSize: '1.6rem', 
+                                fontFamily: 'Outfit', display: 'flex', alignItems: 'center', 
+                                justifyContent: 'center', gap: '0.75rem' 
+                            }}>
+                                <FontAwesomeIcon icon={faEarthEurope} /> Eurocopa
+                            </h3>
+                            {factsEC.length > 0 ? factsEC.map((f: any, i: number) => <FactCard key={`ec-${i}`} f={f} />) : <div className="empty-state">No hay datos</div>}
+                        </div>
                     </div>
                 </div>
-            </div>
+            )}
 
             {/* CTA Comparar */}
-            <div style={{ textAlign: 'center', padding: '2rem', background: 'var(--bg-glass)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border)' }}>
-                <p style={{ fontFamily: 'Outfit', fontSize: '1.2rem', fontWeight: 700, marginBottom: '0.5rem' }}>¿Quieres comparar dos equipos?</p>
-                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.25rem', fontSize: '0.875rem' }}>
+            <div style={{ textAlign: 'center', padding: '2.5rem', background: 'rgba(22, 33, 24, 0.4)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-accent)', marginTop: '4rem' }}>
+                <p style={{ fontFamily: 'Outfit', fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.75rem' }}>¿Quieres comparar dos equipos?</p>
+                <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
                     Mira sus estadísticas cara a cara y descubre quién domina los enfrentamientos directos.
                 </p>
-                <Link to="/comparar" className="btn btn-primary">⚖️ Ir al Comparador</Link>
+                <Link to="/comparar" className="btn btn-primary" style={{ padding: '0.75rem 2rem', fontSize: '1rem' }}>
+                    <FontAwesomeIcon icon={faChartBar} style={{ marginRight: '0.5rem' }} /> Ir al Comparador
+                </Link>
             </div>
         </div>
     );
