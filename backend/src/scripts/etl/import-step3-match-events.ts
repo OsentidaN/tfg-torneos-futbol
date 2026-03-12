@@ -30,7 +30,7 @@ const CONFIG = {
 
 async function importMatchEvents() {
     console.log('🎯 ===== EVENTOS DE PARTIDOS (PLAN DE PAGO) =====\n');
-    
+
     const startTime = Date.now();
     let requestCount = 0;
     let processedCount = 0;
@@ -53,7 +53,7 @@ async function importMatchEvents() {
         });
 
         console.log(`✓ Encontrados ${matches.length} partidos\n`);
-        
+
         if (matches.length === 0) {
             console.log('✅ Todos completados\n');
             return;
@@ -62,7 +62,7 @@ async function importMatchEvents() {
         // Procesar todos
         for (let i = 0; i < matches.length; i++) {
             const match = matches[i];
-            
+
             try {
                 const progress = `[${i + 1}/${matches.length}]`;
                 console.log(`${progress} ${match.homeTeam.name} ${match.homeGoals}-${match.awayGoals} ${match.awayTeam.name}`);
@@ -106,7 +106,7 @@ async function importMatchEvents() {
                             const nameParts = event.player.name.split(' ');
                             const firstName = nameParts[0] || 'Unknown';
                             const lastName = nameParts.slice(1).join(' ') || 'Unknown';
-                            
+
                             const player = await prisma.player.upsert({
                                 where: { apiId: event.player.id },
                                 update: { firstName, lastName },
@@ -150,7 +150,7 @@ async function importMatchEvents() {
             } catch (error) {
                 console.error(`          ❌ Error`);
                 errorCount++;
-                
+
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
                     console.log('          ⏸️  Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));

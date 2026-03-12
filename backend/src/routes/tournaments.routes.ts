@@ -3,7 +3,8 @@ import {
     getAllTournaments,
     getTournamentById,
     getTournamentStats,
-    getTournamentWinners
+    getTournamentWinners,
+    getTournamentRecords
 } from '../controllers/tournaments.controller';
 
 const router = Router();
@@ -16,5 +17,6 @@ router.get('/', getAllTournaments);
 router.get('/:id', getTournamentById);
 router.get('/:id/stats', getTournamentStats);
 router.get('/:id/winners', getTournamentWinners);
+router.get('/:id/records', getTournamentRecords);
 
 export default router;

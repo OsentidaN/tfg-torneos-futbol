@@ -1,166 +1,111 @@
-import { Link } from 'react-router-dom'
-import { Trophy, TrendingUp, Users, Calendar } from 'lucide-react'
-import { useTournaments } from '@hooks/useTournament'
-import { useMatches } from '@hooks/useMatches'
-import Loader from '@components/common/Loader'
-import StatCard from '@components/common/StatCard'
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { getTournaments, getMatches } from '../services/api';
 
-const Home = () => {
-    const { data: tournaments, isLoading: loadingTournaments } = useTournaments()
-    const { data: matchesData, isLoading: loadingMatches } = useMatches({ limit: 6 })
+export default function Home() {
+    const [tournaments, setTournaments] = useState<any[]>([]);
+    const [totalMatches, setTotalMatches] = useState<number>(0);
+    const [loading, setLoading] = useState(true);
 
-    if (loadingTournaments || loadingMatches) return <Loader text="Cargando datos..." />
+    useEffect(() => {
+        Promise.all([
+            getTournaments(),
+            getMatches({ limit: 1, page: 1 })
+        ])
+            .then(([t, m]) => {
+                setTournaments(t.data.data);
+                setTotalMatches(m.data.total ?? 0);
+            })
+            .catch(console.error)
+            .finally(() => setLoading(false));
+    }, []);
 
-    const recentMatches = matchesData?.data || []
+    // Calcular totales a partir de los torneos
+    const totalEdiciones = tournaments.reduce((acc: number, t: any) => acc + (t._count?.seasons ?? 0), 0);
 
     return (
-        <div className="min-h-screen">
-            {/* Hero Section */}
-            <section className="bg-linear-to-br from-pitch-dark via-field-charcoal to-field-black py-20">
-                <div className="container-custom">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
-                        className="text-center max-w-4xl mx-auto"
-                    >
-                        <h1 className="text-5xl md:text-6xl font-display font-bold mb-6 gradient-text">
-                            Fútbol en Datos
-                        </h1>
-                        <p className="text-xl text-gray-300 mb-8">
-                            Explora estadísticas históricas de la Copa Mundial y la Eurocopa.
-                            Compara equipos, analiza enfrentamientos directos y descubre curiosidades.
-                        </p>
-                        <div className="flex flex-wrap gap-4 justify-center">
-                            <Link to="/torneos" className="btn-primary">
-                                Explorar Torneos
-                            </Link>
-                            <Link to="/comparar" className="btn-outline">
-                                Comparar Equipos
-                            </Link>
+        <div>
+            {/* HERO */}
+            <section className="hero">
+                <div className="container">
+                    <h1 className="hero-title" style={{ textTransform: 'uppercase' }}>
+                        Fútbol en <span className="gradient-text">Datos</span>
+                    </h1>
+                    <p className="hero-subtitle">
+                        Explora estadísticas históricas de la Copa Mundial y la Eurocopa. Compara equipos, analiza enfrentamientos y descubre curiosidades de los grandes torneos.
+                    </p>
+                </div>
+            </section>
+
+            {/* STATS */}
+            <div className="container page" style={{ paddingTop: 0 }}>
+                {loading ? (
+                    <div className="loading-state"><div className="spinner" /></div>
+                ) : (
+                    <>
+                        {/* Summary boxes */}
+                        <div className="grid-4" style={{ marginBottom: '4rem', display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+                            <div className="stat-box" style={{ flex: '1 1 200px', maxWidth: '250px' }}>
+                                <div className="value">{tournaments.length}</div>
+                                <div className="label">Torneos</div>
+                            </div>
+                            <div className="stat-box" style={{ flex: '1 1 200px', maxWidth: '250px' }}>
+                                <div className="value">{totalEdiciones}</div>
+                                <div className="label">Ediciones</div>
+                            </div>
+                            <div className="stat-box" style={{ flex: '1 1 200px', maxWidth: '250px' }}>
+                                <div className="value">{totalMatches.toLocaleString()}</div>
+                                <div className="label">Partidos</div>
+                            </div>
                         </div>
-                    </motion.div>
-                </div>
-            </section>
 
-            {/* Stats Overview */}
-            <section className="py-16 bg-field-black">
-                <div className="container-custom">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <StatCard
-                            icon={Trophy}
-                            label="Torneos"
-                            value={tournaments?.length || 0}
-                            color="pitch-green"
-                        />
-                        <StatCard
-                            icon={Calendar}
-                            label="Ediciones"
-                            value="50+"
-                            color="pitch-light"
-                        />
-                        <StatCard
-                            icon={Users}
-                            label="Equipos"
-                            value="87"
-                            color="pitch-green"
-                        />
-                        <StatCard
-                            icon={TrendingUp}
-                            label="Partidos"
-                            value="471"
-                            color="pitch-light"
-                        />
-                    </div>
-                </div>
-            </section>
-
-            {/* Tournaments Section */}
-            <section className="py-16">
-                <div className="container-custom">
-                    <h2 className="text-3xl font-display font-bold mb-8">Torneos Disponibles</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {tournaments?.map((tournament) => (
-                            <Link
-                                key={tournament.id}
-                                to={`/torneos/${tournament.id}`}
-                                className="card-hover"
-                            >
-                                <div className="flex items-center space-x-4">
-                                    <div className="w-16 h-16 bg-pitch-green bg-opacity-20 rounded-full flex items-center justify-center">
-                                        <Trophy className="w-8 h-8 text-pitch-green" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="text-xl font-semibold mb-1">{tournament.name}</h3>
-                                        <p className="text-gray-400 text-sm">
-                                            {tournament._count?.seasons || 0} ediciones
-                                        </p>
-                                    </div>
-                                </div>
-                            </Link>
-                        ))}
-                    </div>
-                </div>
-            </section>
-
-            {/* Recent Matches */}
-            {recentMatches.length > 0 && (
-                <section className="py-16 bg-field-black">
-                    <div className="container-custom">
-                        <div className="flex justify-between items-center mb-8">
-                            <h2 className="text-3xl font-display font-bold">Partidos Recientes</h2>
-                            <Link to="/partidos" className="btn-secondary">
-                                Ver Todos
-                            </Link>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {recentMatches.slice(0, 6).map((match) => (
-                                <Link
-                                    key={match.id}
-                                    to={`/partidos/${match.id}`}
-                                    className="card-hover"
-                                >
-                                    <div className="text-center">
-                                        <div className="flex justify-between items-center mb-4">
-                                            <div className="flex-1 text-right">
-                                                <p className="font-semibold">{match.homeTeam?.name}</p>
-                                            </div>
-                                            <div className="px-4">
-                                                <p className="text-2xl font-bold">
-                                                    {match.homeGoals} - {match.awayGoals}
-                                                </p>
-                                            </div>
-                                            <div className="flex-1 text-left">
-                                                <p className="font-semibold">{match.awayTeam?.name}</p>
+                        {/* Torneos Cards */}
+                        <p className="section-title">🏆 Torneos Disponibles</p>
+                        <div className="grid-2">
+                            {tournaments.map((t: any) => (
+                                <Link to={`/torneos?tipo=${t.type}`} key={t.id} style={{ textDecoration: 'none' }}>
+                                    <div className="card card-link">
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                            <span style={{ fontSize: '2.5rem' }}>
+                                                {t.type === 'WORLD_CUP' ? '🌍' : '🇪🇺'}
+                                            </span>
+                                            <div>
+                                                <div style={{ fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.25rem' }}>{t.name}</div>
+                                                <span className={`badge ${t.type === 'WORLD_CUP' ? 'badge-gold' : 'badge-blue'}`}>
+                                                    {t._count?.seasons} ediciones
+                                                </span>
                                             </div>
                                         </div>
-                                        <p className="text-sm text-gray-400">{match.round}</p>
+                                        <p style={{ marginTop: '1rem', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+                                            {t.type === 'WORLD_CUP'
+                                                ? 'El torneo de fútbol más importante del mundo, celebrado cada 4 años.'
+                                                : 'El campeonato continental de fútbol de la UEFA, celebrado cada 4 años.'}
+                                        </p>
                                     </div>
                                 </Link>
                             ))}
                         </div>
-                    </div>
-                </section>
-            )}
 
-            {/* CTA Section */}
-            <section className="py-20 bg-linear-to-br from-pitch-green to-pitch-dark">
-                <div className="container-custom text-center">
-                    <h2 className="text-4xl font-display font-bold mb-4 text-white">
-                        ¿Listo para explorar?
-                    </h2>
-                    <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
-                        Descubre estadísticas, compara equipos y revive los mejores momentos
-                        de la historia del fútbol mundial.
-                    </p>
-                    <Link to="/torneos" className="btn-primary bg-white text-pitch-dark hover:bg-gray-100">
-                        Comenzar Ahora
-                    </Link>
-                </div>
-            </section>
+                        {/* Quick Actions */}
+                        <div style={{ marginTop: '3rem', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
+                            {[
+                                { to: '/estadisticas', icon: '📊', label: 'Rankings', desc: 'Clasificaciones y tops' },
+                                { to: '/comparar', icon: '⚖️', label: 'Comparar equipos', desc: 'Enfrentamientos directos' },
+                                { to: '/partidos', icon: '📋', label: 'Todos los partidos', desc: 'Historial completo' },
+                                { to: '/equipos', icon: '🛡️', label: 'Equipos', desc: 'Todos los participantes' },
+                            ].map(item => (
+                                <Link to={item.to} key={item.label} style={{ textDecoration: 'none' }}>
+                                    <div className="card card-link" style={{ textAlign: 'center', padding: '1.5rem 1rem' }}>
+                                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>{item.icon}</div>
+                                        <div style={{ fontWeight: 600, marginBottom: '0.25rem' }}>{item.label}</div>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{item.desc}</div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
-    )
+    );
 }
-
-export default Home

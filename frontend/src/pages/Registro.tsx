@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
-import { loginUser } from '../services/api';
+import { registerUser } from '../services/api';
 
-const Login: React.FC = () => {
+const Registro: React.FC = () => {
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -15,14 +16,21 @@ const Login: React.FC = () => {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(password)) {
+            setError('La contraseña debe tener al menos 8 caracteres, números, minúsculas, mayúsculas y signos.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            const res = await loginUser({ email, password });
+            const res = await registerUser({ name, email, password });
             login(res.data.token, res.data.data.user);
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al iniciar sesión');
+            setError(err.response?.data?.message || 'Error al registrar el usuario');
         } finally {
             setLoading(false);
         }
@@ -31,11 +39,15 @@ const Login: React.FC = () => {
     return (
         <div className="page glass-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 64px)' }}>
             <div className="glass-card" style={{ maxWidth: '400px', width: '100%' }}>
-                <h1 className="page-title" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Iniciar Sesión</h1>
+                <h1 className="page-title" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Registro</h1>
 
                 {error && <div className="badge badge-red" style={{ display: 'block', textAlign: 'center', marginBottom: '1rem', padding: '0.5rem' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Nombre</label>
+                        <input type="text" className="input" value={name} onChange={(e) => setName(e.target.value)} required />
+                    </div>
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Correo Electrónico</label>
                         <input type="email" className="input" value={email} onChange={(e) => setEmail(e.target.value)} required />
@@ -43,18 +55,21 @@ const Login: React.FC = () => {
                     <div>
                         <label style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--text-secondary)' }}>Contraseña</label>
                         <input type="password" className="input" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <small style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.25rem', display: 'block' }}>
+                            Al menos 8 caracteres, números, mayúsculas, minúsculas y signos.
+                        </small>
                     </div>
                     <button type="submit" className="btn btn-primary" style={{ justifyContent: 'center', marginTop: '1rem' }} disabled={loading}>
-                        {loading ? 'Iniciando...' : 'Iniciar Sesión'}
+                        {loading ? 'Registrando...' : 'Registrarse'}
                     </button>
                 </form>
 
                 <p style={{ textAlign: 'center', marginTop: '1.5rem', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-                    ¿No tienes sesión? <Link to="/registro" style={{ color: 'var(--accent)' }}>Regístrate aquí</Link>
+                    ¿Ya tienes cuenta? <Link to="/login" style={{ color: 'var(--accent)' }}>Inicia sesión aquí</Link>
                 </p>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default Registro;

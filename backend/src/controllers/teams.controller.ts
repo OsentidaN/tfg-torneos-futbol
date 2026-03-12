@@ -9,12 +9,21 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
     const { search, limit = '50' } = req.query;
 
-    const where: any = {};
+    const where: any = {
+        OR: [
+            { matchesHome: { some: {} } },
+            { matchesAway: { some: {} } }
+        ]
+    };
     if (search) {
-        where.name = {
-            contains: search as string,
-            mode: 'insensitive'
-        };
+        where.AND = [
+            {
+                name: {
+                    contains: search as string,
+                    mode: 'insensitive'
+                }
+            }
+        ];
     }
 
     const teams = await prisma.team.findMany({
@@ -32,9 +41,12 @@ export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
         orderBy: { name: 'asc' }
     });
 
+    const total = await prisma.team.count({ where });
+
     res.json({
         status: 'success',
         results: teams.length,
+        total,
         data: teams
     });
 });
@@ -146,15 +158,27 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('Equipo no encontrado', 404);
     }
 
+    const { type } = req.query;
+
+    const matchWhere: any = {
+        OR: [
+            { homeTeamId: id },
+            { awayTeamId: id }
+        ],
+        status: 'FINISHED'
+    };
+
+    if (type) {
+        matchWhere.season = {
+            tournament: {
+                type: type as string
+            }
+        };
+    }
+
     // Obtener todos los partidos del equipo
     const matches = await prisma.match.findMany({
-        where: {
-            OR: [
-                { homeTeamId: id },
-                { awayTeamId: id }
-            ],
-            status: 'FINISHED'
-        },
+        where: matchWhere,
         select: {
             homeTeamId: true,
             awayTeamId: true,
@@ -184,16 +208,26 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
         else losses++;
     });
 
+    const finalWhere: any = {
+        OR: [
+            { homeTeamId: id },
+            { awayTeamId: id }
+        ],
+        stage: 'FINAL',
+        status: 'FINISHED'
+    };
+
+    if (type) {
+        finalWhere.season = {
+            tournament: {
+                type: type as string
+            }
+        };
+    }
+
     // Títulos (finales ganadas)
     const finals = await prisma.match.findMany({
-        where: {
-            OR: [
-                { homeTeamId: id },
-                { awayTeamId: id }
-            ],
-            stage: 'FINAL',
-            status: 'FINISHED'
-        }
+        where: finalWhere
     });
 
     const titles = finals.filter((final: { homeTeamId: number; awayTeamId: number; homeGoals: number; awayGoals: number; homeGoalsPenalty: number | null; awayGoalsPenalty: number | null }) => {
@@ -246,7 +280,7 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const compareTeams = catchAsync(async (req: Request, res: Response) => {
-    const { team1, team2 } = req.query;
+    const { team1, team2, type } = req.query;
 
     if (!team1 || !team2) {
         throw new AppError('Se requieren los IDs de dos equipos', 400);
@@ -265,15 +299,26 @@ export const compareTeams = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('Uno o ambos equipos no encontrados', 404);
     }
 
+    // Filtro por tipo de torneo
+    const matchWhere: any = {
+        OR: [
+            { homeTeamId: team1Id, awayTeamId: team2Id },
+            { homeTeamId: team2Id, awayTeamId: team1Id }
+        ],
+        status: 'FINISHED'
+    };
+
+    if (type) {
+        matchWhere.season = {
+            tournament: {
+                type: type as string
+            }
+        };
+    }
+
     // Obtener enfrentamientos directos
     const headToHead = await prisma.match.findMany({
-        where: {
-            OR: [
-                { homeTeamId: team1Id, awayTeamId: team2Id },
-                { homeTeamId: team2Id, awayTeamId: team1Id }
-            ],
-            status: 'FINISHED'
-        },
+        where: matchWhere,
         include: {
             season: {
                 include: {

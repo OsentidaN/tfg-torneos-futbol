@@ -9,6 +9,17 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 export const getAllTournaments = catchAsync(async (_req: Request, res: Response) => {
     const tournaments = await prisma.tournament.findMany({
         include: {
+            seasons: {
+                orderBy: { year: 'desc' },
+                include: {
+                    _count: {
+                        select: {
+                            matches: true,
+                            seasonTeams: true
+                        }
+                    }
+                }
+            },
             _count: {
                 select: {
                     seasons: true
@@ -77,10 +88,10 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
             seasons: {
                 include: {
                     matches: {
-                        select: {
-                            homeGoals: true,
-                            awayGoals: true,
-                            status: true
+                        where: { status: 'FINISHED' },
+                        include: {
+                            homeTeam: true,
+                            awayTeam: true
                         }
                     }
                 }
@@ -96,16 +107,33 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
     let totalMatches = 0;
     let totalGoals = 0;
     let finishedMatches = 0;
+    const teamGoalsMap: Record<number, { id: number, name: string, flagUrl: string | null, goals: number }> = {};
 
-    tournament.seasons.forEach((season: { matches: Array<{ status: string; homeGoals: number; awayGoals: number }> }) => {
+    tournament.seasons.forEach(season => {
         season.matches.forEach(match => {
-            if (match.status === 'FINISHED') {
-                finishedMatches++;
-                totalGoals += match.homeGoals + match.awayGoals;
-            }
+            finishedMatches++;
+            totalGoals += match.homeGoals + match.awayGoals;
             totalMatches++;
+
+            // Aggregate team goals
+            if (match.homeTeam) {
+                if (!teamGoalsMap[match.homeTeam.id]) {
+                    teamGoalsMap[match.homeTeam.id] = { id: match.homeTeam.id, name: match.homeTeam.name, flagUrl: match.homeTeam.flagUrl, goals: 0 };
+                }
+                teamGoalsMap[match.homeTeam.id].goals += match.homeGoals;
+            }
+            if (match.awayTeam) {
+                if (!teamGoalsMap[match.awayTeam.id]) {
+                    teamGoalsMap[match.awayTeam.id] = { id: match.awayTeam.id, name: match.awayTeam.name, flagUrl: match.awayTeam.flagUrl, goals: 0 };
+                }
+                teamGoalsMap[match.awayTeam.id].goals += match.awayGoals;
+            }
         });
     });
+
+    const teamGoals = Object.values(teamGoalsMap)
+        .sort((a, b) => b.goals - a.goals)
+        .slice(0, 20); // Top 20 teams
 
     const avgGoalsPerMatch = finishedMatches > 0 
         ? parseFloat((totalGoals / finishedMatches).toFixed(2))
@@ -124,17 +152,16 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
                 totalMatches,
                 finishedMatches,
                 totalGoals,
-                avgGoalsPerMatch
+                avgGoalsPerMatch,
+                teamGoals
             }
         }
     });
 });
-
-// ============================================
+// ============================================
 // GET TOURNAMENT WINNERS (ALL EDITIONS)
 // ============================================
-
-export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
+export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
     const  id  = parseInt(req.params.id as string);
 
     // Verificar que existe el torneo
@@ -165,18 +192,7 @@ export const getTournamentWinners = catchAsync(async (req: Request, res: Respons
     });
 
     // Determinar ganador de cada final
-    const winners = finals.map((final: {
-        homeGoals: number;
-        awayGoals: number;
-        homeGoalsPenalty: number | null;
-        awayGoalsPenalty: number | null;
-        homeTeam: { id: number; name: string; flagUrl: string | null };
-        awayTeam: { id: number; name: string; flagUrl: string | null };
-        season: { year: number };
-        date: Date;
-        venue: string | null;
-        city: string | null;
-    }) => {
+    const winners = finals.map((final: any) => {
         let winner = null;
         let runnerUp = null;
 
@@ -227,3 +243,92 @@ export const getTournamentWinners = catchAsync(async (req: Request, res: Respons
         data: winners
     });
 });
+
+// ============================================
+// GET TOURNAMENT RECORDS (HISTORICAL)
+// ============================================
+export const getTournamentRecords = catchAsync(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id as string);
+
+    const tournament = await prisma.tournament.findUnique({
+        where: { id },
+        include: {
+            seasons: {
+                include: {
+                    matches: {
+                        where: { status: 'FINISHED' },
+                        include: {
+                            homeTeam: true,
+                            awayTeam: true,
+                            events: {
+                                where: {
+                                    type: { in: ['YELLOW_CARD', 'RED_CARD'] }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    if (!tournament) {
+        throw new AppError('Torneo no encontrado', 404);
+    }
+
+    let biggestWinMatch = null;
+    let maxDiff = -1;
+
+    let highestScoringSeason = { season: null as any, goals: -1 };
+    let mostCardsSeason = { season: null as any, cards: -1 };
+
+    tournament.seasons.forEach(season => {
+        let seasonGoals = 0;
+        let seasonCards = 0;
+
+        season.matches.forEach(match => {
+            // Biggest Win
+            const diff = Math.abs(match.homeGoals - match.awayGoals);
+            if (diff > maxDiff) {
+                maxDiff = diff;
+                biggestWinMatch = {
+                    ...match,
+                    seasonYear: season.year
+                };
+            }
+
+            // Season Aggregates
+            seasonGoals += match.homeGoals + match.awayGoals;
+            seasonCards += match.events.length;
+        });
+
+        if (seasonGoals > highestScoringSeason.goals) {
+            highestScoringSeason = { season, goals: seasonGoals };
+        }
+        if (seasonCards > mostCardsSeason.cards) {
+            mostCardsSeason = { season, cards: seasonCards };
+        }
+    });
+
+    res.json({
+        status: 'success',
+        data: {
+            biggestWin: biggestWinMatch ? {
+                score: `${(biggestWinMatch as any).homeGoals}-${(biggestWinMatch as any).awayGoals}`,
+                homeTeam: (biggestWinMatch as any).homeTeam.name,
+                awayTeam: (biggestWinMatch as any).awayTeam.name,
+                year: (biggestWinMatch as any).seasonYear,
+                diff: maxDiff
+            } : null,
+            highestScoringSeason: highestScoringSeason.season ? {
+                year: highestScoringSeason.season.year,
+                goals: highestScoringSeason.goals
+            } : null,
+            mostCardsSeason: mostCardsSeason.season ? {
+                year: mostCardsSeason.season.year,
+                cards: mostCardsSeason.cards
+            } : null
+        }
+    });
+});
+;
