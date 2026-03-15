@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom'
 import { Calendar, MapPin } from 'lucide-react'
-import { Match } from '@/types/match'
-import { formatDate, formatScore } from '@utils/formatters'
-import { STAGE_NAMES, STATUS_COLORS } from '@utils/constants'
+import type { Match } from '@/types/match'
+import { formatDate, formatScore } from '@/utils/formatters'
+import { STAGE_NAMES, STATUS_COLORS } from '@/utils/constants'
 import { motion } from 'framer-motion'
 
 interface MatchCardProps {

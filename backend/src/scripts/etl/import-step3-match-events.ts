@@ -9,8 +9,6 @@ const API_URL = process.env.API_FOOTBALL_URL!;
  * Importa eventos minuto a minuto:
  * - Goles, tarjetas, sustituciones
  * - Crea jugadores automáticamente
- * 
- * Optimizado: delay 200ms, sin límite de batch
  */
 
 interface MatchEvent {
@@ -24,7 +22,7 @@ interface MatchEvent {
 }
 
 const CONFIG = {
-    DELAY: 200,  // 200ms en lugar de 1100ms
+    DELAY: 200,
     MAX_RETRIES: 3
 };
 
@@ -137,7 +135,7 @@ async function importMatchEvents() {
                         eventsCreated++;
 
                     } catch (eventError) {
-                        // Silencioso, continuar
+
                     }
                 }
 

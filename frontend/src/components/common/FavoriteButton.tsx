@@ -1,6 +1,6 @@
 import { Heart } from 'lucide-react'
-import { useFavorites } from '@hooks/useFavorites'
-import { FavoriteType } from '../../types'
+import { useFavorites } from '../../hooks/useFavorites'
+import type { FavoriteType } from '../../types'
 import { motion } from 'framer-motion'
 
 interface FavoriteButtonProps {

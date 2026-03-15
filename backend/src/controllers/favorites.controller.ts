@@ -8,7 +8,7 @@ import { FavoriteType } from '@prisma/client';
 // ============================================
 export const toggleFavorite = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user!.id;
-    const { targetId, type } = req.body; // targetId is matchId or seasonId, type is 'MATCH' or 'SEASON'
+    const { targetId, type } = req.body;
 
     if (!targetId || !type) {
         throw new AppError('targetId y type son obligatorios', 400);
@@ -60,9 +60,9 @@ export const toggleFavorite = catchAsync(async (req: Request, res: Response) => 
         res.status(201).json({
             status: 'success',
             message: 'Añadido a favoritos',
-            data: { 
+            data: {
                 favorite: newFavorite,
-                isFavorite: true 
+                isFavorite: true
             }
         });
     }
@@ -94,10 +94,7 @@ export const getMyFavorites = catchAsync(async (req: Request, res: Response) => 
         }
     });
 
-    // Para las temporadas, como no tienen relación directa en el esquema mas allá de seasonId, 
-    // tenemos que traer los datos manualmente o ajustar el esquema. 
-    // Dado que seasonId está en favorite, podemos mapear y traer las temporadas.
-    
+
     const favoritesWithDetails = await Promise.all(favorites.map(async (fav) => {
         if (fav.favoriteType === 'SEASON' && fav.seasonId) {
             const season = await prisma.season.findUnique({

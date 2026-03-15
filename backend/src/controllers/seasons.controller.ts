@@ -39,10 +39,10 @@ export const getAllSeasons = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
-    const id  = parseInt(req.params.id as string)
+    const id = parseInt(req.params.id as string)
 
     const season = await prisma.season.findUnique({
-        where: { id: id},
+        where: { id: id },
         include: {
             tournament: true,
             seasonTeams: {
@@ -77,7 +77,7 @@ export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getSeasonMatches = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string)
+    const id = parseInt(req.params.id as string)
     const { stage, limit } = req.query;
 
     const where: any = { seasonId: id };
@@ -111,9 +111,8 @@ export const getSeasonMatches = catchAsync(async (req: Request, res: Response) =
 
 export const getSeasonTopScorers = catchAsync(async (req: Request, res: Response) => {
     const id = parseInt(req.params.id as string);
-    const limit = parseInt(req.query.limit as string) || 12; // A bit more for better visibility
-
-    // 1. Get goals from MatchEvent (reliable even for old tournaments)
+    const limit = parseInt(req.query.limit as string) || 12;
+    // 1. Get goals from MatchEvent 
     const goalsData = await prisma.matchEvent.groupBy({
         by: ['playerId'],
         where: {
@@ -124,7 +123,7 @@ export const getSeasonTopScorers = catchAsync(async (req: Request, res: Response
         _count: { id: true },
     });
 
-    // 2. Get assists from MatchPlayerStats (if available)
+    // 2. Get assists from MatchPlayerStats (siempre que sea posible)
     const assistsData = await prisma.matchPlayerStats.groupBy({
         by: ['playerId'],
         where: {

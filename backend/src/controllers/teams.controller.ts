@@ -56,7 +56,7 @@ export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getTeamById = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string);
+    const id = parseInt(req.params.id as string);
 
 
     const team = await prisma.team.findUnique({
@@ -101,13 +101,13 @@ export const getTeamById = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getTeamMatches = catchAsync(async (req: Request, res: Response) => {
-    const id  = parseInt(req.params.id as string);
+    const id = parseInt(req.params.id as string);
 
     const { seasonId, limit = '20' } = req.query;
 
     const where: any = {
         OR: [
-            { homeTeamId: id},
+            { homeTeamId: id },
             { awayTeamId: id }
         ]
     };
@@ -147,7 +147,7 @@ export const getTeamMatches = catchAsync(async (req: Request, res: Response) => 
 // ============================================
 
 export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string);
+    const id = parseInt(req.params.id as string);
 
 
     const team = await prisma.team.findUnique({
@@ -232,21 +232,21 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
 
     const titles = finals.filter((final: { homeTeamId: number; awayTeamId: number; homeGoals: number; awayGoals: number; homeGoalsPenalty: number | null; awayGoalsPenalty: number | null }) => {
         const isHome = final.homeTeamId === id;
-        
+
         // Comparar goles regulares
         if (final.homeGoals !== final.awayGoals) {
-            return isHome 
-                ? final.homeGoals > final.awayGoals 
+            return isHome
+                ? final.homeGoals > final.awayGoals
                 : final.awayGoals > final.homeGoals;
         }
-        
-        // Si hay empate, ver penales
+
+        // Si hay empate, ver penaltis
         if (final.homeGoalsPenalty !== null) {
-            return isHome 
-                ? final.homeGoalsPenalty! > final.awayGoalsPenalty! 
+            return isHome
+                ? final.homeGoalsPenalty! > final.awayGoalsPenalty!
                 : final.awayGoalsPenalty! > final.homeGoalsPenalty!;
         }
-        
+
         return false;
     }).length;
 
@@ -266,7 +266,7 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
                 goalsFor,
                 goalsAgainst,
                 goalDifference: goalsFor - goalsAgainst,
-                winPercentage: matches.length > 0 
+                winPercentage: matches.length > 0
                     ? parseFloat(((wins / matches.length) * 100).toFixed(2))
                     : 0,
                 titles

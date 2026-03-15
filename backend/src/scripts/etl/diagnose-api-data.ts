@@ -23,8 +23,6 @@ if (!API_KEY || !API_URL) {
  * 
  * Este script verifica qué endpoints de la API devuelven datos
  * para cada temporada histórica (2008-2024)
- * 
- * Ejecutar: npx ts-node --transpile-only src/scripts/etl/diagnose-api-data.ts
  */
 
 const LEAGUES = {
@@ -63,7 +61,7 @@ async function diagnoseApiData() {
         // Función para verificar una temporada
         async function checkSeason(leagueId: number, leagueName: string, year: number) {
             console.log(`\n📅 Verificando: ${leagueName} ${year}`);
-            
+
             const result: DiagnosticResult = {
                 year,
                 fixtures: 0,
@@ -85,7 +83,7 @@ async function diagnoseApiData() {
                 });
                 totalRequests++;
                 result.fixtures = fixturesResp.data.response?.length || 0;
-                
+
                 if (result.fixtures > 0) {
                     result.sampleFixtureId = fixturesResp.data.response[0]?.fixture?.id;
                     console.log(`      ✅ ${result.fixtures} partidos encontrados`);
@@ -114,7 +112,7 @@ async function diagnoseApiData() {
                     params: { league: leagueId, season: year }
                 });
                 totalRequests++;
-                
+
                 const standings = standingsResp.data.response[0]?.league?.standings;
                 if (standings && standings.length > 0) {
                     result.standings = standings.flat().length;
@@ -218,17 +216,17 @@ async function diagnoseApiData() {
 
         // Mostrar resumen
         console.log('\n\n📊 ===== RESUMEN DE DISPONIBILIDAD =====\n');
-        
+
         for (const [league, data] of Object.entries(results)) {
             console.log(`\n🏆 ${league.toUpperCase()}`);
             console.log('─'.repeat(80));
             console.log('Año   | Partidos | Teams | Standings | Stats | Events | Lineups | Player Stats');
             console.log('─'.repeat(80));
-            
+
             for (const r of data) {
-                const check = (val: boolean | number) => 
+                const check = (val: boolean | number) =>
                     typeof val === 'boolean' ? (val ? '✅' : '❌') : val.toString().padStart(3);
-                
+
                 console.log(
                     `${r.year} | ${check(r.fixtures).padStart(8)} | ` +
                     `${check(r.teams).padStart(5)} | ${check(r.standings).padStart(9)} | ` +

@@ -19,7 +19,7 @@ const SEASONS_TO_IMPORT = {
 // ⚡ Configuración pensada con el mes de suscripción que he contratado
 const CONFIG = {
     DELAY_BETWEEN_REQUESTS: 200, // Reducido de 2000ms a 200ms
-    ENABLE_PARALLEL: false        // Cambiar a true si quieres procesamiento paralelo
+    ENABLE_PARALLEL: false        // Cambiar a true si en algún momento necesito procesamiento paralelo
 };
 
 async function importBasicData() {

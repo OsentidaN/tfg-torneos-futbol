@@ -59,7 +59,6 @@ async function importWorldCups() {
             console.log(`\n🏆 Procesando: ${league.league.name} (${league.country.name})`);
 
             for (const season of league.seasons) {
-                // Solo importar desde 2014 en adelante
                 if (season.year < 2010) {
                     console.log(`  ⏭️  Saltando Mundial ${season.year} (anterior a 2014)`);
                     continue;
@@ -82,7 +81,7 @@ async function importWorldCups() {
                         startDate: new Date(season.start),
                         endDate: new Date(season.end),
                         imageUrl: league.league.logo,
-                        apiId: uniqueApiId,  // ✨ Ahora es único
+                        apiId: uniqueApiId,
                         apiSource: 'api-football',
                         dataQuality: 'FULL'
                     },
@@ -93,7 +92,7 @@ async function importWorldCups() {
                         startDate: new Date(season.start),
                         endDate: new Date(season.end),
                         imageUrl: league.league.logo,
-                        apiId: uniqueApiId,  // ✨ Ahora es único
+                        apiId: uniqueApiId,
                         apiSource: 'api-football',
                         dataQuality: 'FULL'
                     }
@@ -118,7 +117,6 @@ async function importEuroCups() {
     console.log('🇪🇺 ===== IMPORTANDO EUROCOPAS =====');
 
     try {
-        // Similar al anterior pero para Eurocopas
         console.log('📝 Creando torneo Eurocopa...');
         const euroCupTournament = await prisma.tournament.upsert({
             where: { id: 2 },
@@ -169,7 +167,7 @@ async function importEuroCups() {
                         startDate: new Date(season.start),
                         endDate: new Date(season.end),
                         imageUrl: league.league.logo,
-                        apiId: uniqueApiId,  // ✨ Ahora es único
+                        apiId: uniqueApiId,
                         apiSource: 'api-football',
                         dataQuality: 'FULL'
                     },
@@ -180,7 +178,7 @@ async function importEuroCups() {
                         startDate: new Date(season.start),
                         endDate: new Date(season.end),
                         imageUrl: league.league.logo,
-                        apiId: uniqueApiId,  // ✨ Ahora es único
+                        apiId: uniqueApiId,
                         apiSource: 'api-football',
                         dataQuality: 'FULL'
                     }
@@ -219,12 +217,12 @@ async function main() {
 
         console.log('\n📊 ===== RESUMEN =====');
         console.log(`Total de temporadas importadas: ${seasons.length}`);
-        
+
         // ✨ FIX: Usar for...of en lugar de forEach para evitar error de tipos
         for (const s of seasons) {
             console.log(`  • ${s.tournament.name} ${s.year} - ${s.hostCountry} [${s.dataQuality}]`);
         }
-        
+
         console.log('======================\n');
 
     } catch (error) {

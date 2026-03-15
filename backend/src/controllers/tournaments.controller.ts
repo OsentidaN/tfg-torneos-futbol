@@ -41,7 +41,7 @@ export const getAllTournaments = catchAsync(async (_req: Request, res: Response)
 // ============================================
 
 export const getTournamentById = catchAsync(async (req: Request, res: Response) => {
-    const  id = parseInt(req.params.id as string, 10);
+    const id = parseInt(req.params.id as string, 10);
 
     const tournament = await prisma.tournament.findUnique({
         where: { id: id },
@@ -80,7 +80,7 @@ export const getTournamentById = catchAsync(async (req: Request, res: Response) 
 // ============================================
 
 export const getTournamentStats = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string);
+    const id = parseInt(req.params.id as string);
 
     const tournament = await prisma.tournament.findUnique({
         where: { id: id },
@@ -133,9 +133,8 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
 
     const teamGoals = Object.values(teamGoalsMap)
         .sort((a, b) => b.goals - a.goals)
-        .slice(0, 20); // Top 20 teams
-
-    const avgGoalsPerMatch = finishedMatches > 0 
+        .slice(0, 20);
+    const avgGoalsPerMatch = finishedMatches > 0
         ? parseFloat((totalGoals / finishedMatches).toFixed(2))
         : 0;
 
@@ -158,11 +157,13 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
         }
     });
 });
-// ============================================
+
+// ============================================
 // GET TOURNAMENT WINNERS (ALL EDITIONS)
 // ============================================
-export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string);
+
+export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
+    const id = parseInt(req.params.id as string);
 
     // Verificar que existe el torneo
     const tournament = await prisma.tournament.findUnique({
@@ -203,7 +204,7 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
             winner = final.awayTeam;
             runnerUp = final.homeTeam;
         } else {
-            // Empate - determinado por penales
+            // Empate - determinado por penaltis
             if (final.homeGoalsPenalty! > final.awayGoalsPenalty!) {
                 winner = final.homeTeam;
                 runnerUp = final.awayTeam;
@@ -227,8 +228,8 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
             },
             result: {
                 regular: `${final.homeGoals}-${final.awayGoals}`,
-                penalties: final.homeGoalsPenalty !== null 
-                    ? `${final.homeGoalsPenalty}-${final.awayGoalsPenalty}` 
+                penalties: final.homeGoalsPenalty !== null
+                    ? `${final.homeGoalsPenalty}-${final.awayGoalsPenalty}`
                     : null
             },
             date: final.date,
@@ -297,7 +298,7 @@ export const getTournamentRecords = catchAsync(async (req: Request, res: Respons
                 };
             }
 
-            // Season Aggregates
+
             seasonGoals += match.homeGoals + match.awayGoals;
             seasonCards += match.events.length;
         });

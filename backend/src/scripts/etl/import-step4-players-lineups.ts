@@ -10,9 +10,7 @@ const API_URL = process.env.API_FOOTBALL_URL!;
  * Importa:
  * - Jugadores completos
  * - Alineaciones (todos los años)
- * - Stats de jugadores (solo 2016+)
- * 
- * Optimizado: delay 200ms, sin límite de batch
+ * - Stats de jugadores (solo 2016+), más adelante intentar buscar de otras fuentes. 
  */
 
 const CONFIG = {

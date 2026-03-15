@@ -14,7 +14,7 @@ const router = Router();
 // ============================================
 
 router.get('/', getAllTeams);
-router.get('/compare', compareTeams); // Debe ir antes de /:id
+router.get('/compare', compareTeams); // lo he puesto delante del /:id porque si no no funcionaba
 router.get('/:id', getTeamById);
 router.get('/:id/matches', getTeamMatches);
 router.get('/:id/stats', getTeamStats);

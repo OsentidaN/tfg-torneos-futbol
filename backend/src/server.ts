@@ -28,7 +28,7 @@ const server = app.listen(PORT, () => {
 
 process.on('SIGTERM', async () => {
     console.log('⚠️  SIGTERM recibido, cerrando servidor...');
-    
+
     server.close(async () => {
         console.log('✅ Servidor cerrado');
         await prisma.$disconnect();
@@ -39,7 +39,7 @@ process.on('SIGTERM', async () => {
 
 process.on('SIGINT', async () => {
     console.log('\n⚠️  SIGINT recibido, cerrando servidor...');
-    
+
     server.close(async () => {
         console.log('✅ Servidor cerrado');
         await prisma.$disconnect();

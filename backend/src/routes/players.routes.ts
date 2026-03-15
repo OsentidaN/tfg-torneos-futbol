@@ -14,8 +14,8 @@ const router = Router();
 // ============================================
 
 router.get('/', getAllPlayers);
-router.get('/top-scorers', getTopScorers); // Debe ir antes de /:id
-router.get('/top-assists', getTopAssists);  // Debe ir antes de /:id
+router.get('/top-scorers', getTopScorers); // Lo he puesto antes del /:id porque si no no funcionaba
+router.get('/top-assists', getTopAssists);  // Lo he puesto antes del /:id porque si no no funcionaba
 router.get('/:id', getPlayerById);
 router.get('/:id/stats/season', getPlayerStatsBySeason);
 

@@ -61,14 +61,3 @@ export const protect = catchAsync(async (
     next();
 });
 
-// ============================================
-// RESTRICCIÓN POR ROL (OPCIONAL)
-// ============================================
-
-export const restrictTo = (..._roles: string[]) => {
-    return (_req: Request, _res: Response, next: NextFunction) => {
-        // Implementar cuando añadas roles a tu modelo User
-        // Por ahora, permitir todo
-        next();
-    };
-};

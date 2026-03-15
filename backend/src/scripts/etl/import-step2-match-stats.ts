@@ -19,13 +19,13 @@ interface MatchStats {
 }
 
 const CONFIG = {
-    DELAY: 200,  // 200ms en lugar de 1100ms
+    DELAY: 200,
     MAX_RETRIES: 3
 };
 
 async function importMatchStats() {
     console.log('📊 ===== ESTADÍSTICAS DE PARTIDOS (PLAN DE PAGO) =====\n');
-    
+
     const startTime = Date.now();
     let requestCount = 0;
     let processedCount = 0;
@@ -48,7 +48,7 @@ async function importMatchStats() {
         });
 
         console.log(`✓ Encontrados ${matches.length} partidos\n`);
-        
+
         if (matches.length === 0) {
             console.log('✅ Todos completados\n');
             return;
@@ -57,7 +57,7 @@ async function importMatchStats() {
         // Procesar todos
         for (let i = 0; i < matches.length; i++) {
             const match = matches[i];
-            
+
             try {
                 const progress = `[${i + 1}/${matches.length}]`;
                 console.log(`${progress} ${match.homeTeam.name} vs ${match.awayTeam.name}`);
@@ -135,7 +135,7 @@ async function importMatchStats() {
             } catch (error) {
                 console.error(`          ❌ Error`);
                 errorCount++;
-                
+
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
                     console.log('          ⏸️  Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));
