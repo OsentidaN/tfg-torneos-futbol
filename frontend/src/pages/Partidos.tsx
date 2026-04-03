@@ -80,7 +80,7 @@ export default function Partidos() {
             </div>
 
             {/* Filtros */}
-            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem', flexWrap: 'wrap', padding: '2rem', background: 'rgba(22, 33, 24, 0.4)', borderRadius: '16px', border: '1px solid var(--border-accent)' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem', flexWrap: 'wrap', padding: '2rem', background: 'var(--bg-card)', borderRadius: '16px', border: '1px solid var(--border-accent)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Torneo y Edición</label>
                     <select className="select" style={{ width: 'auto', minWidth: 250, padding: '0.8rem 1.5rem' }}
@@ -130,8 +130,8 @@ export default function Partidos() {
                         const homePenaltyWin = isFinished && isDraw && (m.homeGoalsPenalty ?? 0) > (m.awayGoalsPenalty ?? 0);
                         const awayPenaltyWin = isFinished && isDraw && (m.awayGoalsPenalty ?? 0) > (m.homeGoalsPenalty ?? 0);
 
-                        let homeColor = '#fff';
-                        let awayColor = '#fff';
+                        let homeColor = 'var(--text-primary)';
+                        let awayColor = 'var(--text-primary)';
                         let homeWeight = 500;
                         let awayWeight = 500;
 
@@ -162,11 +162,11 @@ export default function Partidos() {
                             } else if (isDraw) {
                                 // Knockout draw: Highlight penalty winner in WHITE, loser MUTED
                                 if (homePenaltyWin) {
-                                    homeColor = '#fff';
+                                    homeColor = 'var(--accent-2)';
                                     homeWeight = 900;
                                     awayColor = 'var(--text-muted)';
                                 } else if (awayPenaltyWin) {
-                                    awayColor = '#fff';
+                                    awayColor = 'var(--accent-2)';
                                     awayWeight = 900;
                                     homeColor = 'var(--text-muted)';
                                 }
@@ -184,7 +184,7 @@ export default function Partidos() {
                                 key={m.id}
                                 style={{ textDecoration: 'none' }}
                             >
-                                <div className="match-card" style={{ padding: '1.8rem 2.5rem', borderRadius: '16px', background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)' }}>
+                                <div className="match-card" style={{ padding: '1.8rem 2.5rem', borderRadius: '16px', background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                                     <div style={{ flex: 1.5, textAlign: 'right' }}>
                                         <div className="team-flag" style={{ justifyContent: 'flex-end', gap: '1.2rem' }}>
                                             <span className="team-name" style={{ fontSize: '1.2rem', color: homeColor, fontWeight: homeWeight }}>
@@ -196,7 +196,7 @@ export default function Partidos() {
                                         </div>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem', minWidth: '140px' }}>
-                                        <div className="match-score" style={{ fontSize: '2rem', padding: '0.5rem 1.5rem', color: '#fff', background: 'rgba(0,0,0,0.3)', borderRadius: '8px' }}>
+                                        <div className="match-score" style={{ fontSize: '2rem', padding: '0.5rem 1.5rem', color: 'var(--text-primary)', background: 'var(--bg-primary)', borderRadius: '8px', border: '1px solid var(--border-accent)' }}>
                                             {isFinished ? `${m.homeGoals} - ${m.awayGoals}` : 'vs'}
                                         </div>
                                         <span className={`badge ${st.cls}`} style={{ fontSize: '0.8rem', padding: '0.3rem 0.8rem' }}>{st.label}</span>
@@ -212,7 +212,7 @@ export default function Partidos() {
                                         </div>
                                     </div>
                                     <div style={{ minWidth: 200, textAlign: 'right', fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 500, borderLeft: '1px solid var(--border)', paddingLeft: '1.5rem' }}>
-                                        <div style={{ color: '#fff', fontWeight: 700, marginBottom: '0.2rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.6rem' }}>
+                                        <div style={{ color: 'var(--text-primary)', fontWeight: 700, marginBottom: '0.2rem', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.6rem' }}>
                                             <FontAwesomeIcon icon={isEuro ? faEarthEurope : faGlobe} style={{ color: isEuro ? 'var(--accent)' : 'var(--accent-gold)', fontSize: '0.9rem' }} />
                                             {m.season?.tournament?.name} {m.season?.year}
                                         </div>
@@ -233,7 +233,7 @@ export default function Partidos() {
                         onClick={() => setFilters(f => ({ ...f, page: f.page - 1 }))}>
                         <FontAwesomeIcon icon={faChevronLeft} style={{ marginRight: '0.5rem' }} /> Anterior
                     </button>
-                    <span style={{ padding: '0.8rem 1.5rem', color: '#fff', fontSize: '1.1rem', fontWeight: 600, background: 'rgba(255,255,255,0.05)', borderRadius: '8px' }}>
+                    <span style={{ padding: '0.8rem 1.5rem', color: 'var(--text-primary)', fontSize: '1.1rem', fontWeight: 600, background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border)' }}>
                         Página {filters.page} de {Math.ceil(total / 30)}
                     </span>
                     <button className="btn btn-ghost" style={{ padding: '0.8rem 1.5rem', fontSize: '1rem' }} disabled={filters.page * 30 >= total}

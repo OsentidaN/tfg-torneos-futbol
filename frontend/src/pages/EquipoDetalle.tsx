@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { getTeamById, getTeamStats, getTeamMatches } from '../services/api';
 import { translateCountryName } from '../utils/formatters';
+import { Skeleton, SkeletonGrid } from '../components/Skeleton';
 
 export default function EquipoDetalle() {
     const { id } = useParams();
@@ -26,13 +27,29 @@ export default function EquipoDetalle() {
         }).catch(console.error).finally(() => setLoading(false));
     }, [id]);
 
-    if (loading) return <div className="container page"><div className="loading-state"><div className="spinner" /></div></div>;
+    if (loading) return (
+        <div className="container page">
+            <Skeleton type="title" width="40%" />
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+                <Skeleton type="text" width="100px" />
+                <Skeleton type="text" width="100px" />
+            </div>
+            <div className="grid-4" style={{ marginBottom: '2rem' }}>
+                <Skeleton type="card" height={100} />
+                <Skeleton type="card" height={100} />
+                <Skeleton type="card" height={100} />
+                <Skeleton type="card" height={100} />
+            </div>
+            <Skeleton type="text" width="100%" height="40px" style={{ marginBottom: '2rem' }} />
+            <SkeletonGrid count={3} />
+        </div>
+    );
     if (!team) return <div className="container page"><div className="empty-state">Equipo no encontrado</div></div>;
 
     const backPath = location.state?.from || '/equipos';
 
     return (
-        <div className="container page">
+        <div className="container page" id="equipo-detalle-content">
             <Link to={backPath} className="btn btn-ghost" style={{ marginBottom: '1.5rem', display: 'inline-flex' }}>← Volver</Link>
 
             {/* Team Header */}
@@ -48,7 +65,10 @@ export default function EquipoDetalle() {
                         <span className="badge badge-green">{team.seasonTeams?.length} torneos</span>
                     </div>
                 </div>
-                <Link to={`/comparar?team1=${id}`} className="btn btn-secondary" style={{ marginLeft: 'auto' }}>⚖️ Comparar</Link>
+                <div style={{ marginLeft: 'auto', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+
+                    <Link to={`/comparar?team1=${id}`} className="btn btn-primary">⚖️ Comparar</Link>
+                </div>
             </div>
 
             {/* Quick Stats - from /teams/:id/stats */}
@@ -65,7 +85,7 @@ export default function EquipoDetalle() {
             <div className="tabs">
                 {(['torneos', 'partidos', 'estadisticas'] as const).map(tab => (
                     <button key={tab} className={`tab-btn ${activeTab === tab ? 'active' : ''}`} onClick={() => setActiveTab(tab)}>
-                        {tab === 'torneos' ? '📅 Participaciones' : tab === 'partidos' ? '⚽ Últimos Partidos' : '📊 Estadísticas'}
+                        {tab === 'torneos' ? '📅 Participaciones' : tab === 'partidos' ? '⚽ Partidos' : '📊 Estadísticas'}
                     </button>
                 ))}
             </div>

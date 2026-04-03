@@ -73,6 +73,32 @@
   --transition: 0.2s ease;
 }
 
+:root[data-theme='light'] {
+  --bg-primary:    #f8fafc;
+  --bg-secondary:  #ffffff;
+  --bg-card:       rgba(255, 255, 255, 0.98);
+  --bg-glass:      rgba(255, 255, 255, 0.85);
+  --bg-hover:      #f1f5f9;
+
+  --accent:        #0f766e;
+  --accent-2:      #10b981;
+  --accent-warn:   #e11d48;
+  --accent-gold:   #b45309;
+  --accent-purple: #7c3aed;
+
+  --text-primary:  #0f172a;
+  --text-secondary:#334155;
+  --text-muted:    #64748b;
+
+  --border:        #e2e8f0;
+  --border-accent: #cbd5e1;
+
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.08);
+  --shadow-md:  0 8px 20px rgba(0,0,0,0.1);
+  --shadow-lg:  0 12px 40px rgba(0,0,0,0.15);
+  --shadow-glow:0 0 20px rgba(46, 160, 67, 0.1);
+}
+
 /* =====================
    RESET & BASE
    ===================== */
@@ -88,6 +114,13 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   min-height: 100vh;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body[data-theme='light'] {
+  background: linear-gradient(rgba(237, 242, 247, 0.8), rgba(237, 242, 247, 0.8)), 
+              url('./assets/images/Imagen de fondo.png') no-repeat center center fixed;
+  background-size: cover;
 }
 
 a { color: var(--accent); text-decoration: none; transition: opacity var(--transition); }
@@ -121,7 +154,7 @@ img { max-width: 100%; }
    ===================== */
 .navbar {
   height: 80px;
-  background: rgba(13,17,23,0.92);
+  background: var(--bg-glass);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
   position: sticky;
@@ -287,11 +320,17 @@ img { max-width: 100%; }
   letter-spacing: 0.03em;
 }
 
-.badge-blue   { background: rgba(88,166,255,.15); color: var(--accent); }
-.badge-green  { background: rgba(63,185,80,.15);  color: var(--accent-2); }
-.badge-red    { background: rgba(247,129,102,.15); color: var(--accent-warn); }
-.badge-gold   { background: rgba(227,179,65,.15);  color: var(--accent-gold); }
-.badge-purple { background: rgba(188,140,255,.15); color: var(--accent-purple); }
+.badge-blue   { background: rgba(30,144,255,.2); color: var(--accent); }
+.badge-green  { background: rgba(34,139,34,.2);  color: var(--accent-2); }
+.badge-red    { background: rgba(220,20,60,.2);  color: var(--accent-warn); }
+.badge-gold   { background: rgba(218,165,32,.2); color: var(--accent-gold); }
+.badge-purple { background: rgba(138,43,226,.2); color: var(--accent-purple); }
+
+:root[data-theme='light'] .badge-blue   { background: rgba(30,144,255,.12); color: #0056b3; border: 1px solid rgba(0,86,179,0.2); }
+:root[data-theme='light'] .badge-green  { background: rgba(34,139,34,.12);  color: #1e7e34; border: 1px solid rgba(30,126,52,0.2); }
+:root[data-theme='light'] .badge-red    { background: rgba(220,20,60,.12);  color: #bd2130; border: 1px solid rgba(189,33,48,0.2); }
+:root[data-theme='light'] .badge-gold   { background: rgba(218,165,32,.12); color: #856404; border: 1px solid rgba(133,100,4,0.2); }
+:root[data-theme='light'] .badge-purple { background: rgba(138,43,226,.12); color: #5a32a3; border: 1px solid rgba(90,50,163,0.2); }
 
 /* =====================
    BUTTONS
@@ -495,6 +534,30 @@ img { max-width: 100%; }
 .empty-icon { font-size: 2.5rem; }
 
 /* =====================
+   SKELETON LOADERS
+   ===================== */
+.skeleton {
+  background: linear-gradient(-45deg, var(--bg-hover) 40%, rgba(255,255,255,0.05) 50%, var(--bg-hover) 60%);
+  background-size: 300%;
+  background-position-x: 100%;
+  animation: shimmer 1.5s infinite linear;
+  border-radius: var(--radius-sm);
+}
+
+:root[data-theme='light'] .skeleton {
+  background: linear-gradient(-45deg, #e9ecef 40%, #f8f9fa 50%, #e9ecef 60%);
+  background-size: 300%;
+}
+
+@keyframes shimmer {
+  to { background-position-x: 0% }
+}
+
+.skeleton-text { height: 1.2rem; margin-bottom: 0.5rem; border-radius: 4px; }
+.skeleton-title { height: 2.2rem; width: 60%; margin-bottom: 1rem; }
+.skeleton-card { height: 200px; width: 100%; border-radius: var(--radius-lg); }
+
+/* =====================
    HERO SECTION (Home)
    ===================== */
 .hero {
@@ -571,6 +634,15 @@ img { max-width: 100%; }
   border-bottom-color: var(--accent);
 }
 
+.torneo-tabs {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.torneo-tabs .tab-btn {
+  padding: 1.2rem 2rem;
+  font-size: 1.3rem;
+}
+
 /* =====================
    COMPARE PAGE
    ===================== */
@@ -632,9 +704,11 @@ footer {
 /* =====================
    SCROLL BAR
    ===================== */
-::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-primary); }
-::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+::-webkit-scrollbar { width: 8px; height: 12px; }
+::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-corner { background: transparent; }
 
 /* =====================
    RESPONSIVE
@@ -693,4 +767,58 @@ footer {
   .vs-divider { padding-top: 0; }
   .page-title { font-size: 1.75rem; }
   .hero { padding: 3rem 0 2rem; }
+
+  /* Indicador móvil */
+  .mobile-scroll-hint { display: block !important; }
+
+  .torneo-tabs {
+    gap: 0.5rem;
+  }
+  .torneo-tabs .tab-btn {
+    padding: 0.8rem 1rem;
+    font-size: 1rem;
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  /* Tablas Responsivas */
+  .table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+  }
+
+  .data-table th, .data-table td {
+    padding: 0.6rem 0.4rem;
+    font-size: 0.8rem;
+  }
+
+  /* Fase final (Bracket) Overflow Fix */
+  .bracket-container {
+    padding: 1rem !important;
+    gap: 1.5rem !important;
+  }
+  
+  .bracket-column {
+    flex: 0 0 220px !important;
+  }
+
+  /* Match Card (Partidos) Fix */
+  .match-card {
+    flex-wrap: wrap;
+    padding: 1rem !important;
+    gap: 0.5rem !important;
+    justify-content: center;
+  }
+  
+  /* Restructure match layout on mobile */
+  .match-card > div:nth-child(1) { order: 1; flex: 1; text-align: center !important; }
+  .match-card > div:nth-child(1) .team-flag { justify-content: center !important; flex-direction: column-reverse; gap: 0.3rem; }
+  
+  .match-card > .match-score { order: 2; margin: 0.5rem 1rem; width: auto; flex: none; font-size: 1.3rem; padding: 0.3rem 0.8rem; }
+  
+  .match-card > div:nth-child(3) { order: 3; flex: 1; text-align: center !important; }
+  .match-card > div:nth-child(3) .team-flag { justify-content: center !important; flex-direction: column; gap: 0.3rem; }
+  
+  .match-card > div:nth-child(4) { order: 4; width: 100%; text-align: center !important; margin-top: 0.5rem; }
 }

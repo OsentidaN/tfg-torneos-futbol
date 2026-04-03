@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { updateProfile, updatePassword, deleteAccount } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
@@ -84,7 +84,7 @@ export default function Perfil() {
     };
 
     const cardStyle = {
-        background: 'rgba(22, 33, 24, 0.6)',
+        background: 'var(--bg-card)',
         border: '1px solid var(--border-accent)',
         borderRadius: 'var(--radius-lg)',
         padding: '2rem',
@@ -107,8 +107,8 @@ export default function Perfil() {
             padding: '0.75rem 1rem',
             borderRadius: 'var(--radius-md)',
             marginBottom: '1rem',
-            background: msg.ok ? 'rgba(46, 160, 67, 0.15)' : 'rgba(247, 129, 102, 0.15)',
-            border: `1px solid ${msg.ok ? 'var(--accent)' : 'var(--accent-warn)'}`,
+            background: msg.ok ? 'rgba(16, 185, 129, 0.1)' : 'rgba(225, 29, 72, 0.1)',
+            border: `1px solid ${msg.ok ? 'var(--accent-2)' : 'var(--accent-warn)'}`,
             color: msg.ok ? 'var(--accent)' : 'var(--accent-warn)',
             fontWeight: 600,
             fontSize: '0.95rem',
@@ -167,10 +167,10 @@ export default function Perfil() {
                             fontSize: '1rem',
                             display: 'flex', alignItems: 'center', gap: '0.5rem',
                             ...(activeSection === btn.key && btn.danger ? {
-                                background: 'rgba(247, 129, 102, 0.2)',
-                                border: '1px solid var(--accent-warn)',
-                                color: 'var(--accent-warn)'
-                            } : {})
+                            background: 'rgba(225, 29, 72, 0.1)',
+                            border: '1px solid var(--accent-warn)',
+                            color: 'var(--accent-warn)'
+                        } : {})
                         }}
                     >
                         <FontAwesomeIcon icon={btn.icon} />
@@ -239,7 +239,7 @@ export default function Perfil() {
                     ...cardStyle, 
                     animation: 'fadeIn 0.3s ease',
                     border: '1px solid var(--accent-warn)',
-                    background: 'rgba(247, 129, 102, 0.05)'
+                    background: 'rgba(225, 29, 72, 0.05)'
                 }}>
                     <h2 style={{ fontFamily: 'Outfit', fontSize: '1.4rem', marginBottom: '0.75rem', display: 'flex', gap: '0.6rem', alignItems: 'center', color: 'var(--accent-warn)' }}>
                         <FontAwesomeIcon icon={faTrashCan} /> Eliminar Cuenta
@@ -255,7 +255,7 @@ export default function Perfil() {
                         <input style={{ ...inputStyle, borderColor: 'var(--accent-warn)' } as any} type="password" value={deletePwd} onChange={e => setDeletePwd(e.target.value)} placeholder="••••••••" required />
                         <button type="submit" className="btn" style={{ 
                             padding: '0.75rem 2rem', fontSize: '1rem',
-                            background: 'rgba(247, 129, 102, 0.2)',
+                            background: 'rgba(225, 29, 72, 0.1)',
                             border: '1px solid var(--accent-warn)',
                             color: 'var(--accent-warn)'
                         }} disabled={deleteLoading}>

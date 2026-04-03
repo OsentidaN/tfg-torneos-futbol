@@ -4,6 +4,7 @@ import { getTournaments } from '../services/api';
 import { translateCountryName } from '../utils/formatters';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrophy, faGlobe, faEarthEurope } from '@fortawesome/free-solid-svg-icons';
+import { SkeletonGrid } from '../components/Skeleton';
 
 export default function Torneos() {
     const [searchParams] = useSearchParams();
@@ -33,7 +34,9 @@ export default function Torneos() {
             </div>
 
             {loading ? (
-                <div className="loading-state"><div className="spinner" /></div>
+                <div style={{ marginTop: '2rem' }}>
+                    <SkeletonGrid count={6} />
+                </div>
             ) : (
                 tournaments
                     .filter(t => !filterType || t.type === filterType)

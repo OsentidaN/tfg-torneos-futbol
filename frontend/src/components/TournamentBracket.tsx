@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { translateCountryName } from './utils/formatters';
+import { translateCountryName } from '../utils/formatters';
 
 interface Match {
     id: number;
@@ -38,18 +38,18 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
     }
 
     return (
-        <div className="bracket-container" style={{ display: 'flex', gap: '3rem', padding: '2rem', minWidth: 'max-content', justifyContent: 'center', alignItems: 'flex-start' }}>
+        <div className="bracket-container" style={{ display: 'flex', gap: '2rem', padding: '1rem', minWidth: 'max-content', justifyContent: 'center', alignItems: 'flex-start' }}>
             {stages.map(stage => {
                 const stageMatches = getMatchesByStage(stage);
                 if (stageMatches.length === 0 && stage !== 'FINAL') return null;
 
                 return (
-                    <div key={stage} className="bracket-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '0 0 280px' }}>
+                    <div key={stage} className="bracket-column" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: '0 0 250px' }}>
                         <p className="section-title" style={{ 
                             textAlign: 'center', 
                             marginBottom: '1rem', 
                             fontSize: '1.1rem', 
-                            color: '#fff',
+                            color: 'var(--text-primary)',
                             textTransform: 'uppercase',
                             letterSpacing: '0.1em',
                             borderBottom: '2px solid var(--accent)',
@@ -70,8 +70,8 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
                                 const homePenaltyWin = isFinished && isDraw && (match.homeGoalsPenalty ?? 0) > (match.awayGoalsPenalty ?? 0);
                                 const awayPenaltyWin = isFinished && isDraw && (match.awayGoalsPenalty ?? 0) > (match.homeGoalsPenalty ?? 0);
 
-                                let homeColor = '#fff';
-                                let awayColor = '#fff';
+                                let homeColor = 'var(--text-primary)';
+                                let awayColor = 'var(--text-primary)';
                                 let homeWeight = 500;
                                 let awayWeight = 500;
 
@@ -85,11 +85,11 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
                                     homeColor = 'var(--text-muted)';
                                 } else if (isDraw) {
                                     if (homePenaltyWin) {
-                                        homeColor = '#fff';
+                                        homeColor = 'var(--text-primary)';
                                         homeWeight = 800;
                                         awayColor = 'var(--text-muted)';
                                     } else if (awayPenaltyWin) {
-                                        awayColor = '#fff';
+                                        awayColor = 'var(--text-primary)';
                                         awayWeight = 800;
                                         homeColor = 'var(--text-muted)';
                                     }
@@ -103,21 +103,22 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
                                         style={{ textDecoration: 'none' }}
                                     >
                                         <div className="match-card" style={{ 
-                                            width: '280px', 
-                                            padding: '1rem', 
+                                            width: '250px', 
+                                            padding: '1.25rem', 
                                             display: 'flex', 
                                             flexDirection: 'column',
                                             gap: '0.8rem',
-                                            background: 'rgba(22, 33, 24, 0.6)',
+                                            background: 'var(--bg-card)',
                                             border: '1px solid var(--border-accent)',
-                                            borderRadius: '10px'
+                                            borderRadius: '16px',
+                                            boxShadow: 'var(--shadow-sm)'
                                         }}>
                                             {/* Home Team */}
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
                                                     {match.homeTeam.flagUrl && <img src={match.homeTeam.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: '2px' }} />}
                                                     <span style={{ 
-                                                        fontSize: '0.95rem', 
+                                                        fontSize: '1rem', 
                                                         fontWeight: homeWeight,
                                                         color: homeColor,
                                                         whiteSpace: 'nowrap',
@@ -130,20 +131,20 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
                                                 <span style={{ 
                                                     fontWeight: 900, 
                                                     fontSize: '1.2rem',
-                                                    color: '#fff'
+                                                    color: 'var(--text-primary)'
                                                 }}>
                                                     {isFinished ? match.homeGoals : '-'}
                                                 </span>
                                             </div>
                                             
-                                            <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)' }} />
+                                            <div style={{ height: '1px', background: 'var(--border)' }} />
                                             
                                             {/* Away Team */}
                                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', minWidth: 0 }}>
                                                     {match.awayTeam.flagUrl && <img src={match.awayTeam.flagUrl} alt="" style={{ width: 20, height: 14, borderRadius: '2px' }} />}
                                                     <span style={{ 
-                                                        fontSize: '0.95rem', 
+                                                        fontSize: '1rem', 
                                                         fontWeight: awayWeight,
                                                         color: awayColor,
                                                         whiteSpace: 'nowrap',
@@ -156,7 +157,7 @@ export const TournamentBracket: React.FC<{ matches: Match[], returnState?: any }
                                                 <span style={{ 
                                                     fontWeight: 900, 
                                                     fontSize: '1.2rem',
-                                                    color: '#fff'
+                                                    color: 'var(--text-primary)'
                                                 }}>
                                                     {isFinished ? match.awayGoals : '-'}
                                                 </span>

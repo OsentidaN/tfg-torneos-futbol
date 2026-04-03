@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { registerUser } from '../services/api';
+import toast from 'react-hot-toast';
 
 const Registro: React.FC = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
 
     const { login } = useAuth();
@@ -15,11 +15,11 @@ const Registro: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError('');
 
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
         if (!passwordRegex.test(password)) {
-            setError('La contraseña debe tener al menos 8 caracteres, números, minúsculas, mayúsculas y signos.');
+            const msg = 'La contraseña debe tener al menos 8 caracteres, números, minúsculas, mayúsculas y signos.';
+            toast.error(msg);
             return;
         }
 
@@ -28,9 +28,11 @@ const Registro: React.FC = () => {
         try {
             const res = await registerUser({ name, email, password });
             login(res.data.token, res.data.data.user);
+            toast.success('¡Registro completado!');
             navigate('/');
         } catch (err: any) {
-            setError(err.response?.data?.message || 'Error al registrar el usuario');
+            const errorMsg = err.response?.data?.message || 'Error al registrar el usuario';
+            toast.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -40,8 +42,6 @@ const Registro: React.FC = () => {
         <div className="page glass-container" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: 'calc(100vh - 64px)' }}>
             <div className="glass-card" style={{ maxWidth: '400px', width: '100%' }}>
                 <h1 className="page-title" style={{ textAlign: 'center', marginBottom: '1.5rem' }}>Registro</h1>
-
-                {error && <div className="badge badge-red" style={{ display: 'block', textAlign: 'center', marginBottom: '1rem', padding: '0.5rem' }}>{error}</div>}
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     <div>

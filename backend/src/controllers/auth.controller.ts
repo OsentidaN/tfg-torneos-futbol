@@ -1,8 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import crypto from 'crypto';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { sendPasswordResetEmail } from '../services/email.service';
 
 // ============================================
 // GENERAR JWT TOKEN
@@ -238,5 +240,123 @@ export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
     res.json({
         status: 'success',
         message: 'Cuenta eliminada correctamente'
+    });
+});
+
+// ============================================
+// FORGOT PASSWORD
+// ============================================
+
+export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    if (!email) {
+        throw new AppError('El email es obligatorio', 400);
+    }
+
+    // Buscar usuario 
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (!user) {
+        // Enviar respuesta genérica directamente si no existe
+        return res.json({
+            status: 'success',
+            message: 'Si ese email existe en nuestro sistema, recibirás un enlace de recuperación en breve.'
+        });
+    }
+
+    // Generar token aleatorio criptográfico
+    const rawToken = crypto.randomBytes(32).toString('hex');
+
+    // Hashear el token antes de guardarlo en BD
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(rawToken)
+        .digest('hex');
+
+    // Guardar hash en BD con expiración de 1 hora
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            resetPasswordToken: hashedToken,
+            resetPasswordExpiry: new Date(Date.now() + 60 * 60 * 1000) // 1 hora
+        }
+    });
+
+    // Enviar email con el token SIN hashear
+    try {
+        await sendPasswordResetEmail(user.email, user.name, rawToken);
+    } catch (err) {
+        // Si el email falla, limpiar el token de la BD
+        await prisma.user.update({
+            where: { id: user.id },
+            data: { resetPasswordToken: null, resetPasswordExpiry: null }
+        });
+        throw new AppError('Error interno al enviar el correo. Por favor, verifica la configuración del servidor de correo.', 500);
+    }
+
+    return res.json({
+        status: 'success',
+        message: 'Si ese email existe en nuestro sistema, recibirás un enlace de recuperación en breve.'
+    });
+});
+
+// ============================================
+// RESET PASSWORD
+// ============================================
+
+export const resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const token = String(req.params.token);
+    const { password } = req.body;
+
+    if (!token || !password) {
+        throw new AppError('Token y nueva contraseña son obligatorios', 400);
+    }
+
+    if (password.length < 6) {
+        throw new AppError('La contraseña debe tener al menos 6 caracteres', 400);
+    }
+
+    // Hashear el token recibido para compararlo con el de la BD
+    const hashedToken = crypto
+        .createHash('sha256')
+        .update(token)
+        .digest('hex');
+
+    // Buscar usuario con token válido y no expirado
+    const user = await prisma.user.findFirst({
+        where: {
+            resetPasswordToken: hashedToken,
+            resetPasswordExpiry: { gt: new Date() } // Mayor que ahora
+        }
+    });
+
+    if (!user) {
+        throw new AppError('Token inválido o expirado. Solicita un nuevo enlace de recuperación.', 400);
+    }
+
+    // Hashear la nueva contraseña
+    const hashedPassword = await bcrypt.hash(password, 12);
+
+    // Actualizar contraseña y limpiar token
+    await prisma.user.update({
+        where: { id: user.id },
+        data: {
+            passwordHash: hashedPassword,
+            resetPasswordToken: null,
+            resetPasswordExpiry: null
+        }
+    });
+
+    // Generar nuevo JWT para login automático
+    const jwtToken = signToken(user.id);
+
+    res.json({
+        status: 'success',
+        message: 'Contraseña restablecida correctamente.',
+        token: jwtToken,
+        data: {
+            user: { id: user.id, email: user.email, name: user.name }
+        }
     });
 });

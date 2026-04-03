@@ -1,7 +1,12 @@
 import axios from 'axios';
 
+const isProduction = import.meta.env.PROD;
+const API_BASE_URL = isProduction 
+    ? (import.meta.env.VITE_API_URL || '/api') 
+    : '/api';
+
 const api = axios.create({
-    baseURL: '/api',
+    baseURL: API_BASE_URL,
     timeout: 10000,
 });
 
@@ -67,6 +72,12 @@ export const updateProfile = (data: { name: string }) => api.patch('/auth/update
 export const updatePassword = (data: { currentPassword: string; newPassword: string }) =>
     api.patch('/auth/update-password', data);
 export const deleteAccount = (data: { password: string }) =>
-    api.delete('/auth/delete-account', { data });
+    api.post('/auth/delete-account', data);
+
+// --- PASSWORD RECOVERY ---
+export const forgotPassword = (data: { email: string }) =>
+    api.post('/auth/forgot-password', data);
+export const resetPassword = (token: string, data: { password: string }) =>
+    api.post(`/auth/reset-password/${token}`, data);
 
 export default api;

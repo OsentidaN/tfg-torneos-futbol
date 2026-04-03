@@ -334,12 +334,14 @@ model Lineup {
 // USUARIOS Y FAVORITOS
 // ============================================
 model User {
-  id           Int        @id @default(autoincrement())
-  email        String     @unique @db.VarChar(255)
-  passwordHash String     @map("password_hash") @db.VarChar(255)
-  name         String     @db.VarChar(100)
-  createdAt    DateTime   @default(now()) @map("created_at")
-  active       Boolean    @default(true)
+  id                    Int        @id @default(autoincrement())
+  email                 String     @unique @db.VarChar(255)
+  passwordHash          String     @map("password_hash") @db.VarChar(255)
+  name                  String     @db.VarChar(100)
+  createdAt             DateTime   @default(now()) @map("created_at")
+  active                Boolean    @default(true)
+  resetPasswordToken    String?    @map("reset_password_token") @db.VarChar(255)
+  resetPasswordExpiry   DateTime?  @map("reset_password_expiry")
   
   favorites    Favorite[]
   

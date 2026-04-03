@@ -90,7 +90,7 @@ export default function Home() {
                         {/* Quick Actions */}
                         <div style={{ marginTop: '5rem', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                             {[
-                                { to: '/estadisticas', icon: faChartLine, label: 'Rankings', desc: 'Clasificaciones y tops' },
+                                { to: '/estadisticas', icon: faChartLine, label: 'Estadísticas', desc: 'Clasificaciones y tops' },
                                 { to: '/comparar', icon: faCodeCompare, label: 'Comparar equipos', desc: 'Enfrentamientos directos' },
                                 { to: '/partidos', icon: faCalendarDays, label: 'Todos los partidos', desc: 'Historial completo' },
                                 { to: '/equipos', icon: faUsers, label: 'Equipos', desc: 'Todos los participantes' },

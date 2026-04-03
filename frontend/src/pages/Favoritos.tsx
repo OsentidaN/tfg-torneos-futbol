@@ -39,7 +39,7 @@ export default function Favoritos() {
             </div>
 
             {favorites.length === 0 ? (
-                <div className="empty-state" style={{ padding: '5rem 2rem', background: 'rgba(22, 33, 24, 0.4)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-accent)' }}>
+                <div className="empty-state" style={{ padding: '5rem 2rem', background: 'var(--bg-glass)', borderRadius: 'var(--radius-xl)', border: '1px solid var(--border-accent)' }}>
                     <FontAwesomeIcon icon={faHeartCrack} style={{ fontSize: '4rem', color: 'var(--text-muted)', marginBottom: '1.5rem', display: 'block' }} />
                     <p style={{ fontSize: '1.2rem', marginBottom: '0.5rem', fontWeight: 600 }}>Aún no tienes favoritos</p>
                     <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>Guarda torneos y partidos para acceder a ellos rápidamente.</p>
@@ -69,7 +69,7 @@ export default function Favoritos() {
                                     >
                                         <div className="card" style={{ 
                                             padding: '1.75rem', 
-                                            background: 'rgba(22, 33, 24, 0.6)', 
+                                            background: 'var(--bg-card)', 
                                             border: '1px solid var(--border-accent)',
                                             display: 'flex', 
                                             alignItems: 'center', 
@@ -78,7 +78,8 @@ export default function Favoritos() {
                                         }}>
                                             <div style={{ 
                                                 width: 48, height: 48,
-                                                background: 'rgba(46, 160, 67, 0.15)',
+                                                background: 'var(--bg-secondary)',
+                                                border: '1px solid var(--border)',
                                                 borderRadius: '12px',
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                 fontSize: '1.4rem', flexShrink: 0
@@ -126,7 +127,7 @@ export default function Favoritos() {
                                             alignItems: 'center',
                                             gap: '1rem',
                                             padding: '1.25rem 1.75rem',
-                                            background: 'rgba(22, 33, 24, 0.6)',
+                                            background: 'var(--bg-card)',
                                             border: '1px solid var(--border-accent)',
                                             borderRadius: 'var(--radius-lg)',
                                             transition: 'all 0.2s ease',
@@ -150,12 +151,12 @@ export default function Favoritos() {
                                                 fontWeight: 900,
                                                 fontSize: '1.4rem',
                                                 color: 'var(--text-primary)',
-                                                background: 'rgba(255,255,255,0.05)',
+                                                background: 'var(--bg-primary)',
                                                 padding: '0.4rem 1rem',
                                                 borderRadius: 'var(--radius-md)',
                                                 minWidth: '80px',
                                                 textAlign: 'center',
-                                                border: '1px solid var(--border)'
+                                                border: '1px solid var(--border-accent)'
                                             }}>
                                                 {fav.match?.homeGoals} – {fav.match?.awayGoals}
                                             </div>

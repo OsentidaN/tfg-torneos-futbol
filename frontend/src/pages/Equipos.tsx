@@ -41,7 +41,7 @@ export default function Equipos() {
             </div>
 
             {/* Buscador */}
-            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem', padding: '2rem', background: 'rgba(22, 33, 24, 0.4)', borderRadius: '16px', border: '1px solid var(--border-accent)' }}>
+            <div style={{ display: 'flex', gap: '1.5rem', marginBottom: '4rem', padding: '2rem', background: 'var(--bg-glass)', borderRadius: '16px', border: '1px solid var(--border-accent)' }}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', width: '100%', maxWidth: '450px' }}>
                     <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Buscar Selección</label>
                     <input
@@ -66,7 +66,7 @@ export default function Equipos() {
                 }}>
                     {filteredTeams.map((team: any) => (
                         <Link to={`/equipos/${team.id}`} key={team.id} style={{ textDecoration: 'none' }}>
-                            <div className="card card-link" style={{ padding: '2.5rem', borderRadius: '16px', background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <div className="card card-link" style={{ padding: '2.5rem', borderRadius: '16px', background: 'var(--bg-card)', border: '1px solid var(--border-accent)', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '2rem', minWidth: 0 }}>
                                     {team.flagUrl
                                         ? <img src={team.flagUrl} alt={team.name} style={{ width: 80, height: 54, flexShrink: 0, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
@@ -75,7 +75,7 @@ export default function Equipos() {
                                         <div style={{ 
                                             fontWeight: 800, 
                                             fontSize: '1.6rem', 
-                                            color: '#fff', 
+                                            color: 'var(--text-primary)', 
                                             marginBottom: '0.4rem',
                                             lineHeight: 1.2,
                                             wordBreak: 'normal',

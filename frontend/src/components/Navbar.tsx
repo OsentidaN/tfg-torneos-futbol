@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faHouse, 
@@ -14,11 +15,14 @@ import {
     faStar,
     faBars,
     faXmark,
-    faCircleUser
+    faCircleUser,
+    faSun,
+    faMoon
 } from '@fortawesome/free-solid-svg-icons';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
+    const { theme, toggleTheme } = useTheme();
     const navigate = useNavigate();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -55,6 +59,9 @@ export default function Navbar() {
                     </ul>
 
                     <div className="auth-group">
+                        <button onClick={toggleTheme} className="btn btn-ghost" style={{ padding: '0.5rem', width: 40, height: 40, borderRadius: '50%', display: 'flex', justifyContent: 'center', alignItems: 'center' }} title="Cambiar tema">
+                            <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} style={{ fontSize: '1.1rem' }} />
+                        </button>
                         {user ? (
                             <button onClick={handleLogout} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.95rem' }}>
                                 <FontAwesomeIcon icon={faRightFromBracket} style={{ marginRight: '0.4rem' }} /> Cerrar Sesión
@@ -91,6 +98,9 @@ export default function Navbar() {
                         )}
                     </ul>
                     <div className="mobile-auth">
+                        <button onClick={toggleTheme} className="btn btn-ghost" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '1rem', marginBottom: '0.5rem', background: 'var(--bg-secondary)' }}>
+                            <FontAwesomeIcon icon={theme === 'dark' ? faSun : faMoon} style={{ marginRight: '0.4rem' }} /> Cambiar a Modo {theme === 'dark' ? 'Día' : 'Noche'}
+                        </button>
                         {user ? (
                             <button onClick={handleLogout} className="btn btn-primary" style={{ width: '100%', justifyContent: 'center', padding: '0.75rem', fontSize: '1rem' }}>
                                 <FontAwesomeIcon icon={faRightFromBracket} style={{ marginRight: '0.4rem' }} /> Cerrar Sesión

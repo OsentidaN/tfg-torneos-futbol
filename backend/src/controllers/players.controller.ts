@@ -13,14 +13,14 @@ export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
     const skip = (parseInt(page as string) - 1) * take;
 
     const where: any = {};
-    
+
     if (search) {
         where.OR = [
             { firstName: { contains: search as string, mode: 'insensitive' } },
             { lastName: { contains: search as string, mode: 'insensitive' } }
         ];
     }
-    
+
     if (teamId) where.teamId = parseInt(teamId as string);
     if (position) where.position = position;
 
@@ -57,7 +57,7 @@ export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
-    const id  = parseInt(req.params.id as string)
+    const id = parseInt(req.params.id as string)
 
     const player = await prisma.player.findUnique({
         where: { id: id },
@@ -94,13 +94,12 @@ export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('Jugador no encontrado', 404);
     }
 
-    // Calcular estadísticas totales
     const totalGoals = player.playerStats.reduce((sum: number, stat: { goals?: number | null }) => sum + (stat.goals ?? 0), 0);
     const totalAssists = player.playerStats.reduce((sum: number, stat: { assists?: number | null }) => sum + (stat.assists ?? 0), 0);
     const totalYellowCards = player.playerStats.reduce((sum: number, stat: { yellowCards?: number | null }) => sum + (stat.yellowCards ?? 0), 0);
     const totalRedCards = player.playerStats.reduce((sum: number, stat: { redCards?: number | null }) => sum + (stat.redCards ?? 0), 0);
     const totalMinutes = player.playerStats.reduce((sum: number, stat: { minutesPlayed?: number | null }) => sum + (stat.minutesPlayed ?? 0), 0);
-    
+
     const ratingValues = player.playerStats
         .map(s => s.rating)
         .filter((r): r is number => r !== null);
@@ -128,69 +127,98 @@ export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
 
 // ============================================
 // GET TOP SCORERS
+// Usa MatchEvent igual que getSeasonTopScorers.
+// Excluye penaltis de tanda (minute >= 120 con extraMinute)
 // ============================================
 
 export const getTopScorers = catchAsync(async (req: Request, res: Response) => {
     const { seasonId, tournamentId, limit = '20' } = req.query;
 
-    const where: any = {};
-    
+    const matchWhere: any = {};
     if (seasonId) {
-        where.match = { seasonId: parseInt(seasonId as string) };
+        matchWhere.seasonId = parseInt(seasonId as string);
     } else if (tournamentId) {
-        where.match = {
-            season: {
-                tournamentId: parseInt(tournamentId as string)
-            }
+        matchWhere.season = {
+            tournamentId: parseInt(tournamentId as string)
         };
     }
 
-    const topScorers = await prisma.matchPlayerStats.groupBy({
+    // 1. Contar goles desde MatchEvent — excluye penaltis de tanda
+    const goalsData = await prisma.matchEvent.groupBy({
         by: ['playerId'],
-        where,
-        _sum: {
-            goals: true,
-            assists: true
-        },
-        _count: {
-            matchId: true
-        },
-        orderBy: {
-            _sum: {
-                goals: 'desc'
+        where: {
+            match: matchWhere,
+            type: 'GOAL',
+            playerId: { not: null },
+            NOT: {
+                AND: [
+                    { minute: { gte: 120 } },
+                    { extraMinute: { not: null } }
+                ]
             }
         },
-        take: parseInt(limit as string)
+        _count: { id: true },
     });
 
-    // Obtener información de los jugadores
-    const scorersWithInfo = await Promise.all(
-        topScorers.map(async (scorer: typeof topScorers[number]) => {
-            const player = await prisma.player.findUnique({
-                where: { id: scorer.playerId },
-                include: {
-                    team: {
-                        select: { id: true, name: true, flagUrl: true }
-                    }
-                }
-            });
+    // 2. Asistencias desde MatchPlayerStats cuando estén disponibles
+    const assistsData = await prisma.matchPlayerStats.groupBy({
+        by: ['playerId'],
+        where: {
+            match: matchWhere,
+            assists: { gt: 0 }
+        },
+        _sum: { assists: true }
+    });
 
-            return {
-                player: {
-                    id: player?.id,
-                    firstName: player?.firstName,
-                    lastName: player?.lastName,
-                    position: player?.position,
-                    team: player?.team
-                },
-                stats: {
-                    goals: scorer._sum.goals || 0,
-                    assists: scorer._sum.assists || 0,
-                    matchesPlayed: scorer._count.matchId
-                }
-            };
-        })
-    );
+    // 3. Combinar goles y asistencias
+    const playerMap = new Map<number, { goals: number; assists: number }>();
+
+    goalsData.forEach(item => {
+        if (item.playerId) {
+            playerMap.set(item.playerId, { goals: item._count.id, assists: 0 });
+        }
+    });
+
+    assistsData.forEach(item => {
+        const stats = playerMap.get(item.playerId) || { goals: 0, assists: 0 };
+        stats.assists = item._sum.assists || 0;
+        playerMap.set(item.playerId, stats);
+    });
+
+    // 4. Ordenar y tomar los primeros N
+    const sortedIds = Array.from(playerMap.entries())
+        .sort((a, b) => b[1].goals - a[1].goals || b[1].assists - a[1].assists)
+        .slice(0, parseInt(limit as string));
+
+    // 5. Obtener todos los jugadores de golpe (Evitar N+1)
+    const playerIds = sortedIds.map(id => id[0]);
+    const playersInfo = await prisma.player.findMany({
+        where: { id: { in: playerIds } },
+        include: {
+            team: {
+                select: { id: true, name: true, flagUrl: true }
+            }
+        }
+    });
+
+    // 6. Formatear respetando el orden
+    const scorersWithInfo = sortedIds.map(([playerId, stats]) => {
+        const player = playersInfo.find(p => p.id === playerId);
+        return {
+            player: {
+                id: player?.id,
+                firstName: player?.firstName,
+                lastName: player?.lastName,
+                position: player?.position,
+                team: player?.team
+            },
+            stats: {
+                goals: stats.goals,
+                assists: stats.assists,
+                matchesPlayed: 0
+            }
+        };
+    });
 
     res.json({
         status: 'success',
@@ -207,7 +235,7 @@ export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
     const { seasonId, tournamentId, limit = '20' } = req.query;
 
     const where: any = {};
-    
+
     if (seasonId) {
         where.match = { seasonId: parseInt(seasonId as string) };
     } else if (tournamentId) {
@@ -276,7 +304,7 @@ export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getPlayerStatsBySeason = catchAsync(async (req: Request, res: Response) => {
-    const  id  = parseInt(req.params.id as string);
+    const id = parseInt(req.params.id as string);
     const { seasonId } = req.query;
 
     if (!seasonId) {

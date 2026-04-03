@@ -2,6 +2,7 @@ import { useMemo, ReactNode } from 'react'
 import { useAuth } from '../../hooks/useAuth'
 import { FavoriteType } from '../../types'
 import { FavoritesContext, FavoritesContextType } from './favoritesContext'
+import * as api from '../../services/api'
 
 interface FavoritesProviderProps {
     children: ReactNode
@@ -36,22 +37,15 @@ export const FavoritesProvider = ({ children }: FavoritesProviderProps) => {
     }
 
     const toggleFavorite = async (type: FavoriteType, id: number): Promise<void> => {
-        // TODO: Implementar llamada al backend cuando esté disponible
-        console.log('Toggle favorite:', type, id)
-
-        // Ejemplo de implementación futura:
-        // try {
-        //   if (isFavorite(type, id)) {
-        //     await favoritesService.remove(type, id)
-        //   } else {
-        //     await favoritesService.add(type, id)
-        //   }
-        //   // Actualizar user en AuthContext
-        //   await updateUser()
-        // } catch (error) {
-        //   console.error('Error toggling favorite:', error)
-        //   throw error
-        // }
+        try {
+            await api.toggleFavorite({ targetId: id, type })
+            // Nota: Para una actualización en tiempo real perfecta, 
+            // este Context debería solicitar al AuthContext que vuelva a buscar al usuario.
+            // Actualmente recargar la página o volver a la vista actualiza el estado.
+        } catch (error) {
+            console.error('Error toggling favorite:', error)
+            throw error
+        }
     }
 
     const value: FavoritesContextType = {

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { getMatchById, getMatchEvents, getMatchLineups, getFavorites, toggleFavorite } from '../services/api';
 import { formatPlayerName, translateCountryName } from '../utils/formatters';
-import { useAuth } from '../AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { 
     faStar as faStarSolid, faClipboardList, faUsers, faChartBar,
@@ -99,7 +99,7 @@ export default function PartidoDetalle() {
 
             {/* Match Header Card */}
             <div style={{ 
-                background: 'rgba(22, 33, 24, 0.6)', 
+                background: 'var(--bg-card)', 
                 border: '1px solid var(--border-accent)', 
                 borderRadius: 'var(--radius-xl)', 
                 padding: '2.5rem 2rem', 
@@ -138,7 +138,7 @@ export default function PartidoDetalle() {
                             {match.homeTeam?.flagUrl && (
                                 <img src={match.homeTeam.flagUrl} alt="" style={{ width: 80, height: 54, marginBottom: '0.75rem', borderRadius: 6, objectFit: 'cover', boxShadow: 'var(--shadow-md)' }} />
                             )}
-                            <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.6rem', color: '#fff' }}>
+                            <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.6rem', color: 'var(--text-primary)' }}>
                                 {translateCountryName(match.homeTeam?.name)}
                             </div>
                         </Link>
@@ -174,7 +174,7 @@ export default function PartidoDetalle() {
                             {match.awayTeam?.flagUrl && (
                                 <img src={match.awayTeam.flagUrl} alt="" style={{ width: 80, height: 54, marginBottom: '0.75rem', borderRadius: 6, objectFit: 'cover', boxShadow: 'var(--shadow-md)' }} />
                             )}
-                            <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.6rem', color: '#fff' }}>
+                            <div style={{ fontFamily: 'Outfit', fontWeight: 800, fontSize: '1.6rem', color: 'var(--text-primary)' }}>
                                 {translateCountryName(match.awayTeam?.name)}
                             </div>
                         </Link>
@@ -212,12 +212,12 @@ export default function PartidoDetalle() {
                             <p>Sin eventos disponibles</p>
                         </div>
                     ) : (
-                        <div style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
+                        <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', overflow: 'hidden' }}>
                             {events.map((ev: any) => (
                                 <div key={ev.id} style={{
                                     display: 'flex', alignItems: 'center', gap: '1rem',
                                     padding: '0.9rem 1.5rem',
-                                    borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                    borderBottom: '1px solid var(--border)',
                                     flexDirection: ev.teamId === match.homeTeamId ? 'row' : 'row-reverse'
                                 }}>
                                     <span style={{ fontSize: '1.3rem', minWidth: 26 }}>{EVENT_ICONS[ev.type] || '•'}</span>
@@ -240,7 +240,7 @@ export default function PartidoDetalle() {
                 lineups ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
                         {[lineups.homeTeam, lineups.awayTeam].map((team: any) => (
-                            <div key={team.id} style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', padding: '2rem' }}>
+                            <div key={team.id} style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', padding: '2rem' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                                     <FontAwesomeIcon icon={faShirt} style={{ color: 'var(--accent)', fontSize: '1.2rem' }} />
                                     <Link to={`/equipos/${team.id}`} style={{ fontWeight: 700, fontSize: '1.2rem', color: 'var(--text-primary)' }}>
@@ -259,7 +259,7 @@ export default function PartidoDetalle() {
                                         {team.starters.map((p: any) => (
                                             <div key={p.id} style={{ 
                                                 padding: '0.5rem 0', 
-                                                borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                                                borderBottom: '1px solid var(--border)', 
                                                 fontSize: '0.9rem', display: 'flex', gap: '0.75rem', 
                                                 alignItems: 'center'
                                             }}>
@@ -292,15 +292,15 @@ export default function PartidoDetalle() {
                                         {team.substitutes.map((p: any) => (
                                             <div key={p.id} style={{ 
                                                 padding: '0.5rem 0', 
-                                                borderBottom: '1px solid rgba(255,255,255,0.04)', 
+                                                borderBottom: '1px solid var(--border)', 
                                                 fontSize: '0.9rem', display: 'flex', gap: '0.75rem',
                                                 alignItems: 'center', opacity: 0.75
                                             }}>
                                                 <span style={{ 
                                                     color: 'var(--text-secondary)', fontWeight: 600, 
                                                     minWidth: 28, fontSize: '0.85rem',
-                                                    background: 'rgba(255,255,255,0.05)', 
-                                                    borderRadius: 4, padding: '0.1rem 0.4rem',
+                                                    background: 'var(--bg-secondary)', 
+                                                    border: '1px solid var(--border)',
                                                     textAlign: 'center'
                                                 }}>{p.shirtNumber}</span>
                                                 <span style={{ flex: 1, color: 'var(--text-primary)' }}>
@@ -324,7 +324,7 @@ export default function PartidoDetalle() {
             {/* ESTADÍSTICAS */}
             {activeTab === 'estadisticas' && (
                 match.teamStats && match.teamStats.length > 0 ? (
-                    <div style={{ background: 'rgba(22, 33, 24, 0.6)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', padding: '2rem' }}>
+                    <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-accent)', borderRadius: 'var(--radius-lg)', padding: '2rem' }}>
                         {(() => {
                             const home = match.teamStats.find((s: any) => s.teamId === match.homeTeamId);
                             const away = match.teamStats.find((s: any) => s.teamId === match.awayTeamId);
