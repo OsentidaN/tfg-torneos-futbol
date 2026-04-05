@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { parseId } from '../utils/parse';
 
 // ============================================
 // GET ALL TOURNAMENTS
@@ -41,7 +42,7 @@ export const getAllTournaments = catchAsync(async (_req: Request, res: Response)
 // ============================================
 
 export const getTournamentById = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string, 10);
+    const id = parseId(req.params.id as string);
 
     const tournament = await prisma.tournament.findUnique({
         where: { id: id },
@@ -80,7 +81,7 @@ export const getTournamentById = catchAsync(async (req: Request, res: Response) 
 // ============================================
 
 export const getTournamentStats = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
     const tournament = await prisma.tournament.findUnique({
         where: { id: id },
@@ -163,7 +164,7 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
 // ============================================
 
 export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
     // Verificar que existe el torneo
     const tournament = await prisma.tournament.findUnique({
@@ -249,7 +250,7 @@ export const getTournamentWinners = catchAsync(async (req: Request, res: Respons
 // GET TOURNAMENT RECORDS (HISTORICAL)
 // ============================================
 export const getTournamentRecords = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
     const tournament = await prisma.tournament.findUnique({
         where: { id },

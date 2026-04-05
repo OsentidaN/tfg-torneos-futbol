@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { parseId } from '../utils/parse';
 
 // ============================================
 // GET ALL PLAYERS
@@ -57,7 +58,7 @@ export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string)
+    const id = parseId(req.params.id as string)
 
     const player = await prisma.player.findUnique({
         where: { id: id },
@@ -304,7 +305,7 @@ export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getPlayerStatsBySeason = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
     const { seasonId } = req.query;
 
     if (!seasonId) {

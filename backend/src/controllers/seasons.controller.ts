@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { parseId } from '../utils/parse';
 
 // ============================================
 // GET ALL SEASONS
@@ -39,7 +40,7 @@ export const getAllSeasons = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string)
+    const id = parseId(req.params.id as string)
 
     const season = await prisma.season.findUnique({
         where: { id: id },
@@ -77,7 +78,7 @@ export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getSeasonMatches = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string)
+    const id = parseId(req.params.id as string)
     const { stage, limit } = req.query;
 
     const where: any = { seasonId: id };
@@ -112,7 +113,7 @@ export const getSeasonMatches = catchAsync(async (req: Request, res: Response) =
 // ============================================
 
 export const getSeasonTopScorers = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
     const limit = parseInt(req.query.limit as string) || 12;
 
     // 1. Goles desde MatchEvent — excluye penaltis de tanda

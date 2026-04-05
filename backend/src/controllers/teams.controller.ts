@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { parseId } from '../utils/parse';
 
 // ============================================
 // GET ALL TEAMS
@@ -56,7 +57,7 @@ export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getTeamById = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
 
     const team = await prisma.team.findUnique({
@@ -101,7 +102,7 @@ export const getTeamById = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getTeamMatches = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
     const { seasonId, limit = '20' } = req.query;
 
@@ -147,7 +148,7 @@ export const getTeamMatches = catchAsync(async (req: Request, res: Response) => 
 // ============================================
 
 export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
-    const id = parseInt(req.params.id as string);
+    const id = parseId(req.params.id as string);
 
 
     const team = await prisma.team.findUnique({

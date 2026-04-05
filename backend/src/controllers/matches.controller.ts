@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import prisma from '../config/prisma';
 import { catchAsync, AppError } from '../middlewares/error.middleware';
+import { parseId } from '../utils/parse';
 
 // ============================================
 // GET ALL MATCHES
@@ -69,7 +70,7 @@ export const getAllMatches = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getMatchById = catchAsync(async (req: Request, res: Response) => {
-    const matchId = parseInt(req.params.id as string);
+    const matchId = parseId(req.params.id as string);
 
     const match = await prisma.match.findUnique({
         where: { id: matchId },
@@ -106,7 +107,7 @@ export const getMatchById = catchAsync(async (req: Request, res: Response) => {
 // ============================================
 
 export const getMatchEvents = catchAsync(async (req: Request, res: Response) => {
-    const matchId = parseInt(req.params.id as string);
+    const matchId = parseId(req.params.id as string);
 
     const match = await prisma.match.findUnique({
         where: { id: matchId }
@@ -142,7 +143,7 @@ export const getMatchEvents = catchAsync(async (req: Request, res: Response) => 
 // ============================================
 
 export const getMatchLineups = catchAsync(async (req: Request, res: Response) => {
-    const matchId = parseInt(req.params.id as string);
+    const matchId = parseId(req.params.id as string);
 
     const match = await prisma.match.findUnique({
         where: { id: matchId },
@@ -198,7 +199,7 @@ export const getMatchLineups = catchAsync(async (req: Request, res: Response) =>
 // ============================================
 
 export const getMatchPlayerStats = catchAsync(async (req: Request, res: Response) => {
-    const matchId = parseInt(req.params.id as string);
+    const matchId = parseId(req.params.id as string);
 
     const match = await prisma.match.findUnique({
         where: { id: matchId }

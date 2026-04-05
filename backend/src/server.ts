@@ -8,6 +8,14 @@ const PORT = process.env.PORT || 4000;
 // INICIAR SERVIDOR
 // ============================================
 
+const requiredEnvVars = ['JWT_SECRET', 'DATABASE_URL'];
+for (const key of requiredEnvVars) {
+    if (!process.env[key]) {
+        console.error(`❌ Variable de entorno faltante: ${key}`);
+        process.exit(1);
+    }
+}
+
 const server = app.listen(PORT, () => {
     console.log(`
 ╔════════════════════════════════════════╗

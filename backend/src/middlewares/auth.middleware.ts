@@ -40,7 +40,8 @@ export const protect = catchAsync(async (
     }
 
     // 2. Verificar token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!, {
+    algorithms: ['HS256']}) as {
         id: number;
         iat: number;
         exp: number;
