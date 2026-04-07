@@ -152,9 +152,14 @@ export const getTopScorers = catchAsync(async (req: Request, res: Response) => {
             type: 'GOAL',
             playerId: { not: null },
             NOT: {
-                AND: [
-                    { minute: { gte: 120 } },
-                    { extraMinute: { not: null } }
+                OR: [
+                    {
+                        AND: [
+                            { minute: { gte: 120 } },
+                            { extraMinute: { not: null } }
+                        ]
+                    },
+                    { detail: { contains: 'Own Goal', mode: 'insensitive' } }
                 ]
             }
         },
@@ -265,34 +270,36 @@ export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
         take: parseInt(limit as string)
     });
 
-    const assistsWithInfo = await Promise.all(
-        topAssists.map(async (assist: typeof topAssists[number]) => {
-            const player = await prisma.player.findUnique({
-                where: { id: assist.playerId },
-                include: {
-                    team: {
-                        select: { id: true, name: true, flagUrl: true }
-                    }
-                }
-            });
+    const playerIds = topAssists.map(a => a.playerId);
 
-            return {
-                player: {
-                    id: player?.id,
-                    firstName: player?.firstName,
-                    lastName: player?.lastName,
-                    position: player?.position,
-                    team: player?.team
-                },
-                stats: {
-                    assists: assist._sum.assists || 0,
-                    goals: assist._sum.goals || 0,
-                    matchesPlayed: assist._count.matchId
-                }
-            };
-        })
-    );
+    const players = await prisma.player.findMany({
+        where: { id: { in: playerIds } },
+        include: {
+            team: {
+                select: { id: true, name: true, flagUrl: true }
+            }
+        }
+    });
 
+    const playerMap = new Map(players.map(p => [p.id, p]));
+
+    const assistsWithInfo = topAssists.map((assist: typeof topAssists[number]) => {
+        const player = playerMap.get(assist.playerId);
+        return {
+            player: {
+                id: player?.id,
+                firstName: player?.firstName,
+                lastName: player?.lastName,
+                position: player?.position,
+                team: player?.team
+            },
+            stats: {
+                assists: assist._sum.assists || 0,
+                goals: assist._sum.goals || 0,
+                matchesPlayed: assist._count.matchId
+            }
+        };
+    });
     res.json({
         status: 'success',
         results: assistsWithInfo.length,

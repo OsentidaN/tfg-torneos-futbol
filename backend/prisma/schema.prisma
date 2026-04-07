@@ -56,6 +56,7 @@ model Season {
   tournament    Tournament @relation(fields: [tournamentId], references: [id])
   matches       Match[]
   seasonTeams   SeasonTeam[]
+  favorites     Favorite[]
   
   
   @@unique([tournamentId, year])
@@ -360,6 +361,7 @@ model Favorite {
   // Relaciones
   user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
   match        Match?       @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  season       Season?      @relation(fields: [seasonId], references: [id], onDelete: SetNull)
   
   @@index([userId])
   @@map("favorites")

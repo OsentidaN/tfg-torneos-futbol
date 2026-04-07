@@ -1,17 +1,10 @@
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-});
-
-prisma.$connect()
-    .then(() => {
-        console.log('✅ Conectado a PostgreSQL con Prisma');
-    })
-    .catch((error: Error) => {
-        console.error('❌ Error conectando a la base de datos:', error);
-        process.exit(1);
-    });
+    log: process.env.NODE_ENV === 'production'
+        ? ['warn', 'error']
+        : ['query', 'info', 'warn', 'error']
+})
 
 process.on('beforeExit', async () => {
     await prisma.$disconnect();

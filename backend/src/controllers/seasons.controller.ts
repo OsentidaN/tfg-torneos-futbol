@@ -124,9 +124,17 @@ export const getSeasonTopScorers = catchAsync(async (req: Request, res: Response
             type: 'GOAL',
             playerId: { not: null },
             NOT: {
-                AND: [
-                    { minute: { gte: 120 } },
-                    { extraMinute: { not: null } }
+                OR: [
+                    //Excluir penaltis de tanda
+                    {
+                        AND: [
+                            { minute: { gte: 120 } },
+                            { extraMinute: { not: null } }
+                        ]
+                    },
+
+                    //Excluir goles en propia puerta
+                    { detail: { contains: 'Own Goal', mode: 'insensitive' } }
                 ]
             }
         },

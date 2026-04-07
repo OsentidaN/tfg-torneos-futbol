@@ -82,35 +82,20 @@ export const getMyFavorites = catchAsync(async (req: Request, res: Response) => 
                     homeTeam: true,
                     awayTeam: true,
                     season: {
-                        include: {
-                            tournament: true
-                        }
+                        include: { tournament: true }
                     }
                 }
+            },
+            season: {
+                include: { tournament: true }
             }
         },
-        orderBy: {
-            createdAt: 'desc'
-        }
+        orderBy: { createdAt: 'desc' }
     });
-
-
-    const favoritesWithDetails = await Promise.all(favorites.map(async (fav) => {
-        if (fav.favoriteType === 'SEASON' && fav.seasonId) {
-            const season = await prisma.season.findUnique({
-                where: { id: fav.seasonId },
-                include: { tournament: true }
-            });
-            return { ...fav, season };
-        }
-        return fav;
-    }));
 
     res.json({
         status: 'success',
-        results: favoritesWithDetails.length,
-        data: {
-            favorites: favoritesWithDetails
-        }
+        results: favorites.length,
+        data: { favorites }
     });
 });
