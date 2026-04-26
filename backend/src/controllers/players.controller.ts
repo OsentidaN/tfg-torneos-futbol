@@ -8,10 +8,12 @@ import { parseId } from '../utils/parse';
 // ============================================
 
 export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
-    const { search, teamId, position, limit = '50', page = '1' } = req.query;
+    const { search, teamId, position } = req.query;
 
-    const take = parseInt(limit as string);
-    const skip = (parseInt(page as string) - 1) * take;
+    const limit = Math.max(1, parseInt(req.query.limit as string) || 50);
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const take = limit;
+    const skip = (page - 1) * take;
 
     const where: any = {};
 
@@ -47,7 +49,8 @@ export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
         status: 'success',
         results: players.length,
         total,
-        page: parseInt(page as string),
+        page: String(page),
+        limit: String(limit),
         totalPages: Math.ceil(total / take),
         data: players
     });

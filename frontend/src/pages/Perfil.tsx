@@ -56,7 +56,11 @@ export default function Perfil() {
     const handleUpdatePassword = async (e: React.FormEvent) => {
         e.preventDefault();
         if (newPwd !== confirmPwd) { setPwdMsg({ text: 'Las contraseñas no coinciden', ok: false }); return; }
-        if (newPwd.length < 6) { setPwdMsg({ text: 'La contraseña debe tener al menos 6 caracteres', ok: false }); return; }
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+        if (!passwordRegex.test(newPwd)) { 
+            setPwdMsg({ text: 'La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', ok: false }); 
+            return; 
+        }
         setPwdLoading(true); setPwdMsg(null);
         try {
             await updatePassword({ currentPassword: currentPwd, newPassword: newPwd });
@@ -221,7 +225,7 @@ export default function Perfil() {
                         <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
                             Nueva contraseña
                         </label>
-                        <input style={inputStyle as any} type="password" value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="••••••••" required minLength={6} />
+                        <input style={inputStyle as any} type="password" value={newPwd} onChange={e => setNewPwd(e.target.value)} placeholder="••••••••" required minLength={8} />
                         <label style={{ display: 'block', marginBottom: '0.4rem', color: 'var(--text-secondary)', fontSize: '0.9rem', fontWeight: 600 }}>
                             Confirmar nueva contraseña
                         </label>

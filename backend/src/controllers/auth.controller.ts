@@ -34,8 +34,14 @@ export const register = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('Email, contraseña y nombre son obligatorios', 400);
     }
 
-    if (password.length < 6) {
-        throw new AppError('La contraseña debe tener al menos 6 caracteres', 400);
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        throw new AppError('El formato del correo electrónico no es válido', 400);
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        throw new AppError('La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', 400);
     }
 
     // Verificar si el usuario ya existe
@@ -160,8 +166,9 @@ export const updatePassword = catchAsync(async (req: Request, res: Response) => 
         throw new AppError('Contraseña actual y nueva son obligatorias', 400);
     }
 
-    if (newPassword.length < 6) {
-        throw new AppError('La nueva contraseña debe tener al menos 6 caracteres', 400);
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(newPassword)) {
+        throw new AppError('La nueva contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', 400);
     }
 
     // Obtener usuario con contraseña
@@ -287,12 +294,8 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response) => 
     try {
         await sendPasswordResetEmail(user.email, user.name, rawToken);
     } catch (err) {
-        // Si el email falla, limpiar el token de la BD
-        await prisma.user.update({
-            where: { id: user.id },
-            data: { resetPasswordToken: null, resetPasswordExpiry: null }
-        });
-        throw new AppError('Error interno al enviar el correo. Por favor, verifica la configuración del servidor de correo.', 500);
+        // Logueamos el error pero no lo lanzamos para evitar enumeración de cuentas
+        console.error('❌ Error al enviar email de recuperación:', err);
     }
 
     return res.json({
@@ -313,8 +316,9 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
         throw new AppError('Token y nueva contraseña son obligatorios', 400);
     }
 
-    if (password.length < 6) {
-        throw new AppError('La contraseña debe tener al menos 6 caracteres', 400);
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!passwordRegex.test(password)) {
+        throw new AppError('La nueva contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', 400);
     }
 
     // Hashear el token recibido para compararlo con el de la BD

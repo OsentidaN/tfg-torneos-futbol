@@ -18,6 +18,7 @@ import Favoritos from './pages/Favoritos';
 import Perfil from './pages/Perfil';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
@@ -49,8 +50,8 @@ function App() {
         <Route path="/estadisticas" element={<Estadisticas />} />
         <Route path="/login" element={<Login />} />
         <Route path="/registro" element={<Registro />} />
-        <Route path="/favoritos" element={<Favoritos />} />
-        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/favoritos" element={<ProtectedRoute><Favoritos /></ProtectedRoute>} />
+        <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
       </Routes>

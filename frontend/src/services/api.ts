@@ -19,6 +19,18 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
+// Interceptor para manejar errores globales (ej: token expirado)
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        }
+        return Promise.reject(error);
+    }
+);
+
 // --- AUTH ---
 export const registerUser = (data: { name: string; email: string; password: string }) => 
     api.post('/auth/register', data);

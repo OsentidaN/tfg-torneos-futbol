@@ -264,7 +264,7 @@ async function importPlayersAndLineups() {
                                 }
                             },
                             update: {
-                                minutesPlayed: stats.games?.minutes || null,
+                                minutesPlayed: stats.games?.minutes ?? 0,
                                 rating: stats.games?.rating ? parseFloat(stats.games.rating) : null,
                                 goals: stats.goals?.total || 0,
                                 assists: stats.goals?.assists || 0,
@@ -278,7 +278,7 @@ async function importPlayersAndLineups() {
                             create: {
                                 matchId: match.id,    // ← Usa IDs directos
                                 playerId: player.id,  // ← Usa IDs directos
-                                minutesPlayed: stats.games?.minutes || null,
+                                minutesPlayed: stats.games?.minutes ?? 0,
                                 rating: stats.games?.rating ? parseFloat(stats.games.rating) : null,
                                 goals: stats.goals?.total || 0,
                                 assists: stats.goals?.assists || 0,
