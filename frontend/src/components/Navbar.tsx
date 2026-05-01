@@ -3,14 +3,14 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faHouse, 
-    faTrophy, 
-    faCalendarDays, 
-    faUsers, 
-    faChartLine, 
-    faCodeCompare, 
-    faRightToBracket, 
+import {
+    faHouse,
+    faTrophy,
+    faCalendarDays,
+    faUsers,
+    faChartLine,
+    faCodeCompare,
+    faRightToBracket,
     faRightFromBracket,
     faStar,
     faBars,
@@ -74,13 +74,10 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Menu Button */}
                 <button className="mobile-menu-btn" onClick={() => setIsMenuOpen(!isMenuOpen)}>
                     <FontAwesomeIcon icon={isMenuOpen ? faXmark : faBars} />
                 </button>
             </div>
-
-            {/* Mobile Menu Overlay */}
             {isMenuOpen && (
                 <div className="mobile-menu">
                     <ul className="mobile-links">

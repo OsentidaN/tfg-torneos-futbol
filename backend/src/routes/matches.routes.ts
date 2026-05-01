@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 // ============================================
-// MATCH ROUTES (PUBLIC)
+// PARTIDOS DE LA API (PUBLICOS)
 // ============================================
 
 router.get('/', getAllMatches);

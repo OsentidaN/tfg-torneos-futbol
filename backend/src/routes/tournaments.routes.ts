@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 // ============================================
-// TOURNAMENT ROUTES (PUBLIC)
+// TORNEOS DE LA API (PUBLICOS)
 // ============================================
 
 router.get('/', getAllTournaments);

@@ -4,7 +4,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { parseId } from '../utils/parse';
 
 // ============================================
-// GET ALL TOURNAMENTS
+// OBTENER TODOS LOS TORNEOS
 // ============================================
 
 export const getAllTournaments = catchAsync(async (_req: Request, res: Response) => {
@@ -38,7 +38,7 @@ export const getAllTournaments = catchAsync(async (_req: Request, res: Response)
 });
 
 // ============================================
-// GET TOURNAMENT BY ID
+// OBTENER TORNEO POR ID
 // ============================================
 
 export const getTournamentById = catchAsync(async (req: Request, res: Response) => {
@@ -77,7 +77,7 @@ export const getTournamentById = catchAsync(async (req: Request, res: Response) 
 });
 
 // ============================================
-// GET TOURNAMENT STATS
+// OBTENER ESTADÍSTICAS DEL TORNEO
 // ============================================
 
 export const getTournamentStats = catchAsync(async (req: Request, res: Response) => {
@@ -118,7 +118,7 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
         _sum: { awayGoals: true }
     });
 
-    // Combinar en JS (sigue siendo mucho más ligero que traer todos los partidos)
+    // Combinar en JS (porque es mucho más ligero que traer todos los partidos, lo probé  y tardaba mucho, así que al final me decanté por esta opción)
     const teamGoalsMap: Record<number, number> = {};
     homeGoals.forEach(g => {
         teamGoalsMap[g.homeTeamId] = (teamGoalsMap[g.homeTeamId] || 0) + (g._sum.homeGoals || 0);
@@ -168,7 +168,7 @@ export const getTournamentStats = catchAsync(async (req: Request, res: Response)
 });
 
 // ============================================
-// GET TOURNAMENT WINNERS (ALL EDITIONS)
+// OBTENER FINALISTAS DE TODAS LAS EDICIONES DEL TORNEO
 // ============================================
 
 export const getTournamentWinners = catchAsync(async (req: Request, res: Response) => {
@@ -225,7 +225,7 @@ export const getTournamentWinners = catchAsync(async (req: Request, res: Respons
                     runnerUp = final.homeTeam;
                 }
             } else {
-                // Fallback si no hay datos de penaltis (no debería pasar pero evita crash)
+                // Fallback si no hay datos de penaltis (no debería pasar pero evita que falle la API)
                 winner = final.homeTeam;
                 runnerUp = final.awayTeam;
             }
@@ -263,7 +263,7 @@ export const getTournamentWinners = catchAsync(async (req: Request, res: Respons
 });
 
 // ============================================
-// GET TOURNAMENT RECORDS (HISTORICAL)
+// OBTENER RÉCORDS DEL TORNEO (HISTÓRICO)
 // ============================================
 export const getTournamentRecords = catchAsync(async (req: Request, res: Response) => {
     const id = parseId(req.params.id as string);
@@ -280,8 +280,7 @@ export const getTournamentRecords = catchAsync(async (req: Request, res: Respons
 
     const seasonIds = seasons.map(s => s.id);
 
-    // 2. Biggest Win (Mayor diferencia de goles)
-    // Buscamos los top 100 partidos para encontrar la mayor diferencia en JS
+    // 2. Mayor diferencia de goles
     const candidates = await prisma.match.findMany({
         where: { seasonId: { in: seasonIds }, status: 'FINISHED' },
         take: 100,
@@ -299,29 +298,29 @@ export const getTournamentRecords = catchAsync(async (req: Request, res: Respons
         }
     });
 
-    // 3. Highest Scoring Season
+    // 3. Temporada con más goles
     const seasonGoals = await prisma.match.groupBy({
         by: ['seasonId'],
         where: { seasonId: { in: seasonIds }, status: 'FINISHED' },
         _sum: { homeGoals: true, awayGoals: true },
-        orderBy: { _sum: { homeGoals: 'desc' } } // No podemos ordenar por suma de ambos directamente en Prisma
+        orderBy: { _sum: { homeGoals: 'desc' } }
     });
 
     // Recalcular suma total en JS para encontrar la verdadera máxima
     const sortedSeasonGoals = seasonGoals
-        .map(s => ({ 
-            id: s.seasonId, 
-            goals: (s._sum.homeGoals || 0) + (s._sum.awayGoals || 0) 
+        .map(s => ({
+            id: s.seasonId,
+            goals: (s._sum.homeGoals || 0) + (s._sum.awayGoals || 0)
         }))
         .sort((a, b) => b.goals - a.goals);
-    
+
     const topSeasonGoals = sortedSeasonGoals[0];
     const topSeasonGoalsYear = seasons.find(s => s.id === topSeasonGoals?.id)?.year;
 
-    // 4. Most Cards Season
+    // 4. Temporada con más tarjetas
     const cardsByMatch = await prisma.matchEvent.groupBy({
         by: ['matchId'],
-        where: { 
+        where: {
             match: { seasonId: { in: seasonIds } },
             type: { in: ['YELLOW_CARD', 'RED_CARD'] }
         },
@@ -344,7 +343,7 @@ export const getTournamentRecords = catchAsync(async (req: Request, res: Respons
 
     const topCardsSeasonId = Object.entries(cardsBySeason)
         .sort((a, b) => b[1] - a[1])[0];
-    
+
     const topCardsYear = seasons.find(s => s.id === (topCardsSeasonId ? parseInt(topCardsSeasonId[0]) : null))?.year;
 
     res.json({

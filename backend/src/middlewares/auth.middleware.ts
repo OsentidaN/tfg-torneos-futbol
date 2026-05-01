@@ -4,7 +4,7 @@ import { catchAsync, AppError } from './error.middleware';
 import prisma from '../config/prisma';
 
 // ============================================
-// EXTENDER REQUEST TYPE
+// EXTENDER TIPO DE REQUETS
 // ============================================
 
 declare global {
@@ -41,7 +41,8 @@ export const protect = catchAsync(async (
 
     // 2. Verificar token
     const decoded = jwt.verify(token, process.env.JWT_SECRET!, {
-    algorithms: ['HS256']}) as {
+        algorithms: ['HS256']
+    }) as {
         id: number;
         iat: number;
         exp: number;

@@ -14,16 +14,16 @@ const signToken = (id: number): string => {
     if (!secret) {
         throw new Error('JWT_SECRET no está definido en las variables de entorno');
     }
-    
+
     return jwt.sign(
-        { id }, 
+        { id },
         secret,
         { expiresIn: process.env.JWT_EXPIRES_IN || '7d' } as any
     );
 };
 
 // ============================================
-// REGISTER
+// REGISTRO DE USUARIOS
 // ============================================
 
 export const register = catchAsync(async (req: Request, res: Response) => {
@@ -128,7 +128,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET CURRENT USER
+// OBTENER USUARIO ACTUAL
 // ============================================
 
 export const getMe = catchAsync(async (req: Request, res: Response) => {
@@ -156,7 +156,7 @@ export const getMe = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// UPDATE PASSWORD
+// ACTUALIZAR CONTRASEÑA
 // ============================================
 
 export const updatePassword = catchAsync(async (req: Request, res: Response) => {
@@ -199,7 +199,7 @@ export const updatePassword = catchAsync(async (req: Request, res: Response) => 
 });
 
 // ============================================
-// UPDATE PROFILE (name)
+// ACTUALIZAR NOMBRE
 // ============================================
 
 export const updateProfile = catchAsync(async (req: Request, res: Response) => {
@@ -223,7 +223,7 @@ export const updateProfile = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// DELETE ACCOUNT
+// ELIMINAR CUENTA
 // ============================================
 
 export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
@@ -251,7 +251,7 @@ export const deleteAccount = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// FORGOT PASSWORD
+// RECUPERAR CONTRASEÑA
 // ============================================
 
 export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
@@ -295,7 +295,7 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response) => 
         await sendPasswordResetEmail(user.email, user.name, rawToken);
     } catch (err) {
         // Logueamos el error pero no lo lanzamos para evitar enumeración de cuentas
-        console.error('❌ Error al enviar email de recuperación:', err);
+        console.error('Error al enviar email de recuperación:', err);
     }
 
     return res.json({
@@ -305,7 +305,7 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response) => 
 });
 
 // ============================================
-// RESET PASSWORD
+// RESTABLECER CONTRASEÑA
 // ============================================
 
 export const resetPassword = catchAsync(async (req: Request, res: Response) => {
@@ -331,7 +331,7 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
     const user = await prisma.user.findFirst({
         where: {
             resetPasswordToken: hashedToken,
-            resetPasswordExpiry: { gt: new Date() } // Mayor que ahora
+            resetPasswordExpiry: { gt: new Date() }
         }
     });
 
@@ -363,4 +363,4 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
             user: { id: user.id, email: user.email, name: user.name }
         }
     });
-});
+});

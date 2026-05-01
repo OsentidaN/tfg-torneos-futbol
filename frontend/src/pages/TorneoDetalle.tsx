@@ -23,7 +23,6 @@ export default function TorneoDetalle() {
     const [matches, setMatches] = useState<any[]>([]);
     const [scorers, setScorers] = useState<any[]>([]);
 
-    // Initialize from URL or defaults
     const activeTab = (searchParams.get('tab') as any) || 'clasificacion';
     const stageFilter = searchParams.get('fase') || '';
 
@@ -49,7 +48,7 @@ export default function TorneoDetalle() {
     useEffect(() => {
         if (!id) return;
         const numId = Number(id);
-        
+
         const fetchData = async () => {
             try {
                 const [s, m, sc] = await Promise.all([
@@ -61,7 +60,6 @@ export default function TorneoDetalle() {
                 setMatches(m.data.data);
                 setScorers(sc.data.data);
 
-                // Check if favorite
                 if (user) {
                     const favs = await getFavorites();
                     const favList = favs.data.data.favorites;
@@ -108,7 +106,7 @@ export default function TorneoDetalle() {
             </div>
         </div>
     );
-    
+
     if (!season) return <div className="container page"><div className="empty-state">Temporada no encontrada</div></div>;
 
     const groupedStandings = season.seasonTeams?.reduce((acc: any, st: any) => {
@@ -141,9 +139,9 @@ export default function TorneoDetalle() {
                 </Link>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '2.5rem', flexWrap: 'wrap', justifyContent: 'space-between' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
-                        <FontAwesomeIcon 
-                            icon={tournamentType === 'WORLD_CUP' ? faGlobe : faEarthEurope} 
-                            style={{ fontSize: '4rem', color: tournamentType === 'WORLD_CUP' ? 'var(--accent-gold)' : 'var(--accent)' }} 
+                        <FontAwesomeIcon
+                            icon={tournamentType === 'WORLD_CUP' ? faGlobe : faEarthEurope}
+                            style={{ fontSize: '4rem', color: tournamentType === 'WORLD_CUP' ? 'var(--accent-gold)' : 'var(--accent)' }}
                         />
                         <div>
                             <h1 className="page-title" style={{ marginBottom: '0.5rem', fontSize: '3rem', color: 'var(--text-primary)', fontWeight: 900 }}>
@@ -158,14 +156,14 @@ export default function TorneoDetalle() {
                     </div>
 
                     {user && (
-                        <button 
+                        <button
                             onClick={handleToggleFavorite}
                             className={`btn ${isFavorite ? 'btn-primary' : 'btn-ghost'}`}
                             style={{ padding: '0.8rem 1.6rem', fontSize: '1.1rem' }}
                         >
-                            <FontAwesomeIcon 
-                                icon={isFavorite ? faStarSolid : faStarRegular} 
-                                style={{ color: isFavorite ? '#fff' : 'var(--accent)', marginRight: '0.6rem' }} 
+                            <FontAwesomeIcon
+                                icon={isFavorite ? faStarSolid : faStarRegular}
+                                style={{ color: isFavorite ? '#fff' : 'var(--accent)', marginRight: '0.6rem' }}
                             />
                             {isFavorite ? 'En Favoritos' : 'Añadir a Favoritos'}
                         </button>
@@ -174,26 +172,26 @@ export default function TorneoDetalle() {
                 </div>
             </div>
 
-            {/* Tabs */}
+            {/* Pestañas */}
             <div className="tabs torneo-tabs" style={{ marginBottom: '3.5rem', borderBottom: '3px solid var(--border)' }}>
                 {(['clasificacion', 'fase_final', 'partidos', 'goleadores'] as const).map(tab => (
-                    <button 
-                        key={tab} 
-                        className={`tab-btn ${activeTab === tab ? 'active' : ''}`} 
+                    <button
+                        key={tab}
+                        className={`tab-btn ${activeTab === tab ? 'active' : ''}`}
                         onClick={() => setActiveTab(tab)}
                         style={{ fontWeight: 700, color: activeTab === tab ? 'var(--accent)' : 'var(--text-muted)' }}
                     >
                         <FontAwesomeIcon icon={
-                            tab === 'clasificacion' ? faChartBar : 
-                            tab === 'fase_final' ? faSitemap : 
-                            tab === 'partidos' ? faCalendarAlt : faFutbol
+                            tab === 'clasificacion' ? faChartBar :
+                                tab === 'fase_final' ? faSitemap :
+                                    tab === 'partidos' ? faCalendarAlt : faFutbol
                         } style={{ marginRight: '0.8rem' }} />
                         {tab === 'clasificacion' ? 'Clasificación' : tab === 'fase_final' ? 'Fase Final' : tab === 'partidos' ? 'Partidos' : 'Goleadores'}
                     </button>
                 ))}
             </div>
 
-            {/* CLASIFICACIÓN */}
+            {/* Clasificación */}
             {activeTab === 'clasificacion' && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '3rem' }}>
                     {groupedStandings && Object.keys(groupedStandings).sort().map((grp: string) => (
@@ -220,7 +218,7 @@ export default function TorneoDetalle() {
                                                                 {st.team?.flagUrl
                                                                     ? <img src={st.team.flagUrl} alt={st.team.name} style={{ width: '40px', height: '28px', borderRadius: '4px' }} />
                                                                     : <div className="flag-placeholder">?</div>}
-                                                                <Link 
+                                                                <Link
                                                                     to={`/equipos/${st.teamId}`}
                                                                     state={{ from: location.pathname + location.search }}
                                                                     style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '1.2rem' }}
@@ -243,11 +241,11 @@ export default function TorneoDetalle() {
                 </div>
             )}
 
-            {/* FASE FINAL */}
+            {/* Fase Final */}
             {activeTab === 'fase_final' && (
                 <div style={{ position: 'relative' }}>
                     {/* Indicador móvil */}
-                    <div className="mobile-scroll-hint" style={{ 
+                    <div className="mobile-scroll-hint" style={{
                         textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '1rem', display: 'none', background: 'rgba(255,255,255,0.05)', padding: '0.5rem', borderRadius: '8px'
                     }}>
                         ↔️ Desliza horizontalmente la tabla para ver todos los cruces
@@ -283,11 +281,11 @@ export default function TorneoDetalle() {
                                     const isFinished = m.status === 'FINISHED';
                                     const homeGoals = m.homeGoals ?? 0;
                                     const awayGoals = m.awayGoals ?? 0;
-                                    
+
                                     const homeWin = isFinished && homeGoals > awayGoals;
                                     const awayWin = isFinished && awayGoals > homeGoals;
                                     const isDraw = isFinished && homeGoals === awayGoals;
-                                    
+
                                     const homePenaltyWin = isFinished && isDraw && (m.homeGoalsPenalty ?? 0) > (m.awayGoalsPenalty ?? 0);
                                     const awayPenaltyWin = isFinished && isDraw && (m.awayGoalsPenalty ?? 0) > (m.homeGoalsPenalty ?? 0);
 
@@ -312,7 +310,6 @@ export default function TorneoDetalle() {
                                             homeColor = 'var(--text-muted)';
                                         }
                                     } else {
-                                        // Knockout stages
                                         if (homeWin) {
                                             homeColor = 'var(--accent-2)';
                                             homeWeight = 900;
@@ -323,7 +320,7 @@ export default function TorneoDetalle() {
                                             homeColor = 'var(--text-muted)';
                                         } else if (isDraw) {
                                             if (homePenaltyWin) {
-                                                homeColor = 'var(--accent-2)'; 
+                                                homeColor = 'var(--accent-2)';
                                                 homeWeight = 900;
                                                 awayColor = 'var(--text-muted)';
                                             } else if (awayPenaltyWin) {
@@ -333,7 +330,7 @@ export default function TorneoDetalle() {
                                             }
                                         }
                                     }
-                                    
+
                                     return (
                                         <Link
                                             to={`/partidos/${m.id}`}
@@ -344,8 +341,8 @@ export default function TorneoDetalle() {
                                             <div className="match-card" style={{ padding: '1.5rem 2rem', borderRadius: '12px', background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
                                                 <div style={{ flex: 1, textAlign: 'right' }}>
                                                     <div className="team-flag" style={{ justifyContent: 'flex-end', gap: '1rem' }}>
-                                                        <span className="team-name" style={{ 
-                                                            fontSize: '1.1rem', 
+                                                        <span className="team-name" style={{
+                                                            fontSize: '1.1rem',
                                                             color: homeColor,
                                                             fontWeight: homeWeight
                                                         }}>
@@ -354,9 +351,9 @@ export default function TorneoDetalle() {
                                                         {m.homeTeam?.flagUrl ? <img src={m.homeTeam.flagUrl} alt="" style={{ width: 32, height: 22, borderRadius: '2px' }} /> : <div className="flag-placeholder">?</div>}
                                                     </div>
                                                 </div>
-                                                <div className="match-score" style={{ 
-                                                    fontSize: '1.8rem', 
-                                                    padding: '0.4rem 1.2rem', 
+                                                <div className="match-score" style={{
+                                                    fontSize: '1.8rem',
+                                                    padding: '0.4rem 1.2rem',
                                                     minWidth: '100px',
                                                     color: 'var(--text-primary)',
                                                     background: 'var(--bg-primary)',
@@ -367,8 +364,8 @@ export default function TorneoDetalle() {
                                                 <div style={{ flex: 1 }}>
                                                     <div className="team-flag" style={{ gap: '1rem' }}>
                                                         {m.awayTeam?.flagUrl ? <img src={m.awayTeam.flagUrl} alt="" style={{ width: 32, height: 22, borderRadius: '2px' }} /> : <div className="flag-placeholder">?</div>}
-                                                        <span className="team-name" style={{ 
-                                                            fontSize: '1.1rem', 
+                                                        <span className="team-name" style={{
+                                                            fontSize: '1.1rem',
                                                             color: awayColor,
                                                             fontWeight: awayWeight
                                                         }}>
@@ -413,10 +410,10 @@ export default function TorneoDetalle() {
                                     ) : scorers.map((sc: any, i: number) => (
                                         <tr key={sc.player?.id} style={{ background: i < 3 ? 'rgba(46, 160, 67, 0.05)' : 'transparent' }}>
                                             <td style={{ padding: '1.5rem 1rem' }}>
-                                                {i === 0 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#ffd700', fontSize: '1.5rem' }} /> : 
-                                                 i === 1 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#c0c0c0', fontSize: '1.4rem' }} /> : 
-                                                 i === 2 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#cd7f32', fontSize: '1.3rem' }} /> : 
-                                                 <span style={{ color: 'var(--text-muted)', paddingLeft: '0.3rem' }}>{i + 1}</span>}
+                                                {i === 0 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#ffd700', fontSize: '1.5rem' }} /> :
+                                                    i === 1 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#c0c0c0', fontSize: '1.4rem' }} /> :
+                                                        i === 2 ? <FontAwesomeIcon icon={faMedal} style={{ color: '#cd7f32', fontSize: '1.3rem' }} /> :
+                                                            <span style={{ color: 'var(--text-muted)', paddingLeft: '0.3rem' }}>{i + 1}</span>}
                                             </td>
                                             <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
                                                 {formatPlayerName(sc.player?.firstName, sc.player?.lastName)}

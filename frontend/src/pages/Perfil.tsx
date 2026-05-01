@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile, updatePassword, deleteAccount } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
     faUser, faPen, faLock, faTrashCan, faCheckCircle,
     faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
@@ -15,19 +15,19 @@ export default function Perfil() {
     const navigate = useNavigate();
     const [activeSection, setActiveSection] = useState<Section | null>(null);
 
-    // Name form
+
     const [newName, setNewName] = useState(user?.name || '');
     const [nameMsg, setNameMsg] = useState<{ text: string; ok: boolean } | null>(null);
     const [nameLoading, setNameLoading] = useState(false);
 
-    // Password form
+
     const [currentPwd, setCurrentPwd] = useState('');
     const [newPwd, setNewPwd] = useState('');
     const [confirmPwd, setConfirmPwd] = useState('');
     const [pwdMsg, setPwdMsg] = useState<{ text: string; ok: boolean } | null>(null);
     const [pwdLoading, setPwdLoading] = useState(false);
 
-    // Delete form
+
     const [deletePwd, setDeletePwd] = useState('');
     const [deleteMsg, setDeleteMsg] = useState<{ text: string; ok: boolean } | null>(null);
     const [deleteLoading, setDeleteLoading] = useState(false);
@@ -38,13 +38,12 @@ export default function Perfil() {
         try {
             const res = await updateProfile({ name: newName });
             const updatedUser = res.data.data.user;
-            // Update stored user info
+
             const token = localStorage.getItem('token');
             if (token) {
                 localStorage.setItem('user', JSON.stringify(updatedUser));
             }
             setNameMsg({ text: '¡Nombre actualizado correctamente!', ok: true });
-            // Force refresh via page reload to update AuthContext
             setTimeout(() => window.location.reload(), 800);
         } catch (err: any) {
             setNameMsg({ text: err.response?.data?.message || 'Error al actualizar el nombre', ok: false });
@@ -57,9 +56,9 @@ export default function Perfil() {
         e.preventDefault();
         if (newPwd !== confirmPwd) { setPwdMsg({ text: 'Las contraseñas no coinciden', ok: false }); return; }
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
-        if (!passwordRegex.test(newPwd)) { 
-            setPwdMsg({ text: 'La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', ok: false }); 
-            return; 
+        if (!passwordRegex.test(newPwd)) {
+            setPwdMsg({ text: 'La contraseña debe tener al menos 8 caracteres, incluyendo mayúsculas, minúsculas, números y un carácter especial.', ok: false });
+            return;
         }
         setPwdLoading(true); setPwdMsg(null);
         try {
@@ -141,8 +140,6 @@ export default function Perfil() {
                     Gestiona tu cuenta y preferencias
                 </p>
             </div>
-
-            {/* User info card */}
             <div style={{ ...cardStyle, marginBottom: '3rem', display: 'flex', alignItems: 'center', gap: '2rem' }}>
                 <div style={{
                     width: 72, height: 72, borderRadius: '50%',
@@ -158,8 +155,6 @@ export default function Perfil() {
                     <div style={{ color: 'var(--text-secondary)', fontSize: '1rem', marginTop: '0.2rem' }}>{user?.email}</div>
                 </div>
             </div>
-
-            {/* Action selector */}
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
                 {sectionBtns.map(btn => (
                     <button
@@ -171,10 +166,10 @@ export default function Perfil() {
                             fontSize: '1rem',
                             display: 'flex', alignItems: 'center', gap: '0.5rem',
                             ...(activeSection === btn.key && btn.danger ? {
-                            background: 'rgba(225, 29, 72, 0.1)',
-                            border: '1px solid var(--accent-warn)',
-                            color: 'var(--accent-warn)'
-                        } : {})
+                                background: 'rgba(225, 29, 72, 0.1)',
+                                border: '1px solid var(--accent-warn)',
+                                color: 'var(--accent-warn)'
+                            } : {})
                         }}
                     >
                         <FontAwesomeIcon icon={btn.icon} />
@@ -239,8 +234,8 @@ export default function Perfil() {
 
             {/* ── Eliminar Cuenta ── */}
             {activeSection === 'borrar' && (
-                <div style={{ 
-                    ...cardStyle, 
+                <div style={{
+                    ...cardStyle,
                     animation: 'fadeIn 0.3s ease',
                     border: '1px solid var(--accent-warn)',
                     background: 'rgba(225, 29, 72, 0.05)'
@@ -257,7 +252,7 @@ export default function Perfil() {
                             Tu contraseña
                         </label>
                         <input style={{ ...inputStyle, borderColor: 'var(--accent-warn)' } as any} type="password" value={deletePwd} onChange={e => setDeletePwd(e.target.value)} placeholder="••••••••" required />
-                        <button type="submit" className="btn" style={{ 
+                        <button type="submit" className="btn" style={{
                             padding: '0.75rem 2rem', fontSize: '1rem',
                             background: 'rgba(225, 29, 72, 0.1)',
                             border: '1px solid var(--accent-warn)',

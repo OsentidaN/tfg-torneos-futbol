@@ -1,6 +1,6 @@
-import { Position } from './common'
-import { Team } from './team'
-import { MatchPlayerStats } from './match'
+import type { Position } from './common'
+import type { Team } from './team'
+import type { MatchPlayerStats } from './match'
 
 export interface Player {
     id: number

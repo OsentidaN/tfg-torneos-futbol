@@ -1,6 +1,6 @@
-import { MatchStage, MatchStatus, Position, EventType  } from './common'
-import { Team } from './team'
-import { Season } from './seasons'
+import type { MatchStage, MatchStatus, Position, EventType } from './common'
+import type { Team } from './team'
+import type { Season } from './seasons'
 
 
 export interface Match {

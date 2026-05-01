@@ -4,7 +4,7 @@ import { getMatchById, getMatchEvents, getMatchLineups, getFavorites, toggleFavo
 import { formatPlayerName, translateCountryName } from '../utils/formatters';
 import { useAuth } from '../context/AuthContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
+import {
     faStar as faStarSolid, faClipboardList, faUsers, faChartBar,
     faLocationDot, faCalendarDays, faArrowLeft, faShirt
 } from '@fortawesome/free-solid-svg-icons';
@@ -75,7 +75,7 @@ export default function PartidoDetalle() {
 
     return (
         <div className="container page">
-            {/* Back + Favorite row */}
+            {/* Volver + Favorito */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
                 <Link
                     to={(location.state as any)?.from || "/partidos"}
@@ -97,20 +97,20 @@ export default function PartidoDetalle() {
                 )}
             </div>
 
-            {/* Match Header Card */}
-            <div style={{ 
-                background: 'var(--bg-card)', 
-                border: '1px solid var(--border-accent)', 
-                borderRadius: 'var(--radius-xl)', 
-                padding: '2.5rem 2rem', 
-                marginBottom: '2rem', 
-                textAlign: 'center' 
+            {/* Tarjeta de encabezado de partido */}
+            <div style={{
+                background: 'var(--bg-card)',
+                border: '1px solid var(--border-accent)',
+                borderRadius: 'var(--radius-xl)',
+                padding: '2.5rem 2rem',
+                marginBottom: '2rem',
+                textAlign: 'center'
             }}>
-                {/* Tournament + Round */}
+                {/* Torneo + Ronda */}
                 <div style={{ marginBottom: '1.5rem' }}>
-                    <span style={{ 
-                        fontSize: '1rem', 
-                        color: 'var(--text-secondary)', 
+                    <span style={{
+                        fontSize: '1rem',
+                        color: 'var(--text-secondary)',
                         fontWeight: 600,
                         background: 'rgba(46, 160, 67, 0.1)',
                         padding: '0.3rem 1rem',
@@ -120,10 +120,10 @@ export default function PartidoDetalle() {
                         {match.season?.tournament?.name} {match.season?.year}
                     </span>
                     {match.round && (
-                        <span style={{ 
+                        <span style={{
                             marginLeft: '0.75rem',
-                            fontSize: '0.9rem', 
-                            color: 'var(--text-secondary)', 
+                            fontSize: '0.9rem',
+                            color: 'var(--text-secondary)',
                             fontWeight: 500
                         }}>
                             · {match.round}
@@ -131,7 +131,7 @@ export default function PartidoDetalle() {
                     )}
                 </div>
 
-                {/* Teams + Score */}
+                {/* Equipos + Resultado */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '2rem', alignItems: 'center' }}>
                     <div style={{ textAlign: 'right' }}>
                         <Link to={`/equipos/${match.homeTeamId}`} style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
@@ -182,7 +182,7 @@ export default function PartidoDetalle() {
                 </div>
             </div>
 
-            {/* Tabs */}
+            {/* Pestañas */}
             <div className="tabs" style={{ justifyContent: 'center', marginBottom: '2rem', gap: '0.5rem', borderBottom: 'none' }}>
                 {tabs.map(tab => (
                     <button
@@ -250,23 +250,23 @@ export default function PartidoDetalle() {
 
                                 {team.starters?.length > 0 && (
                                     <>
-                                        <p style={{ 
-                                            fontSize: '0.78rem', color: 'var(--accent)', marginBottom: '0.75rem', 
+                                        <p style={{
+                                            fontSize: '0.78rem', color: 'var(--accent)', marginBottom: '0.75rem',
                                             textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700
                                         }}>
                                             Titulares
                                         </p>
                                         {team.starters.map((p: any) => (
-                                            <div key={p.id} style={{ 
-                                                padding: '0.5rem 0', 
-                                                borderBottom: '1px solid var(--border)', 
-                                                fontSize: '0.9rem', display: 'flex', gap: '0.75rem', 
+                                            <div key={p.id} style={{
+                                                padding: '0.5rem 0',
+                                                borderBottom: '1px solid var(--border)',
+                                                fontSize: '0.9rem', display: 'flex', gap: '0.75rem',
                                                 alignItems: 'center'
                                             }}>
-                                                <span style={{ 
-                                                    color: 'var(--text-primary)', fontWeight: 700, 
+                                                <span style={{
+                                                    color: 'var(--text-primary)', fontWeight: 700,
                                                     minWidth: 28, fontSize: '0.85rem',
-                                                    background: 'rgba(46,160,67,0.15)', 
+                                                    background: 'rgba(46,160,67,0.15)',
                                                     borderRadius: 4, padding: '0.1rem 0.4rem',
                                                     textAlign: 'center'
                                                 }}>{p.shirtNumber}</span>
@@ -283,23 +283,23 @@ export default function PartidoDetalle() {
 
                                 {team.substitutes?.length > 0 && (
                                     <>
-                                        <p style={{ 
-                                            fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '1.25rem', marginBottom: '0.75rem', 
+                                        <p style={{
+                                            fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '1.25rem', marginBottom: '0.75rem',
                                             textTransform: 'uppercase', letterSpacing: '0.08em', fontWeight: 700
                                         }}>
                                             Suplentes
                                         </p>
                                         {team.substitutes.map((p: any) => (
-                                            <div key={p.id} style={{ 
-                                                padding: '0.5rem 0', 
-                                                borderBottom: '1px solid var(--border)', 
+                                            <div key={p.id} style={{
+                                                padding: '0.5rem 0',
+                                                borderBottom: '1px solid var(--border)',
                                                 fontSize: '0.9rem', display: 'flex', gap: '0.75rem',
                                                 alignItems: 'center', opacity: 0.75
                                             }}>
-                                                <span style={{ 
-                                                    color: 'var(--text-secondary)', fontWeight: 600, 
+                                                <span style={{
+                                                    color: 'var(--text-secondary)', fontWeight: 600,
                                                     minWidth: 28, fontSize: '0.85rem',
-                                                    background: 'var(--bg-secondary)', 
+                                                    background: 'var(--bg-secondary)',
                                                     border: '1px solid var(--border)',
                                                     textAlign: 'center'
                                                 }}>{p.shirtNumber}</span>

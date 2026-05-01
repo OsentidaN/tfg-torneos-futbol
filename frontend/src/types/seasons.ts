@@ -1,5 +1,5 @@
-import { Tournament } from './tournament'
-import { Match } from './match'
+import type { Tournament } from './tournament'
+import type { Match } from './match'
 
 export interface Season {
     id: number

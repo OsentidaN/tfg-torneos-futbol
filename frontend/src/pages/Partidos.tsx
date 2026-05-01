@@ -13,7 +13,7 @@ const STAGES: Record<string, string> = {
 const STATUS_BADGE: Record<string, { label: string; cls: string }> = {
     FINISHED: { label: 'Finalizado', cls: 'badge-green' },
     SCHEDULED: { label: 'Programado', cls: 'badge-blue' },
-    LIVE: { label: '🔴 En Vivo', cls: 'badge-red' },
+    LIVE: { label: ' En Vivo', cls: 'badge-red' },
     CANCELLED: { label: 'Cancelado', cls: 'badge-red' },
 };
 
@@ -25,7 +25,6 @@ export default function Partidos() {
     const location = useLocation();
     const [searchParams, setSearchParams] = useSearchParams();
 
-    // Initialize filters from URL
     const filters = {
         seasonId: searchParams.get('seasonId') || '',
         stage: searchParams.get('stage') || '',
@@ -64,14 +63,11 @@ export default function Partidos() {
             setTotal(r.data.total);
         }).catch(console.error).finally(() => setLoading(false));
     }, [filters.seasonId, filters.stage, filters.page]);
-
-    const stageOrder = ['GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL'];
-
     return (
         <div className="container page">
             <div style={{ marginBottom: '4rem' }}>
                 <h1 className="page-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <FontAwesomeIcon icon={faCalendarAlt} style={{ color: 'var(--accent)' }} /> 
+                    <FontAwesomeIcon icon={faCalendarAlt} style={{ color: 'var(--accent)' }} />
                     Partidos
                 </h1>
                 <p className="page-subtitle" style={{ fontSize: '1.2rem', opacity: 0.8 }}>
@@ -120,13 +116,13 @@ export default function Partidos() {
                         const isGroup = m.stage === 'GROUP';
                         const isFinished = m.status === 'FINISHED';
                         const st = STATUS_BADGE[m.status] || STATUS_BADGE.SCHEDULED;
-                        
+
                         const homeGoals = m.homeGoals ?? 0;
                         const awayGoals = m.awayGoals ?? 0;
                         const homeWin = isFinished && homeGoals > awayGoals;
                         const awayWin = isFinished && awayGoals > homeGoals;
                         const isDraw = isFinished && homeGoals === awayGoals;
-                        
+
                         const homePenaltyWin = isFinished && isDraw && (m.homeGoalsPenalty ?? 0) > (m.awayGoalsPenalty ?? 0);
                         const awayPenaltyWin = isFinished && isDraw && (m.awayGoalsPenalty ?? 0) > (m.homeGoalsPenalty ?? 0);
 
@@ -160,7 +156,6 @@ export default function Partidos() {
                                 awayWeight = 900;
                                 homeColor = 'var(--text-muted)';
                             } else if (isDraw) {
-                                // Knockout draw: Highlight penalty winner in WHITE, loser MUTED
                                 if (homePenaltyWin) {
                                     homeColor = 'var(--accent-2)';
                                     homeWeight = 900;
@@ -170,7 +165,6 @@ export default function Partidos() {
                                     awayWeight = 900;
                                     homeColor = 'var(--text-muted)';
                                 }
-                                // If no penalty data yet, keep both white but normal weight
                             }
                         }
 
@@ -226,7 +220,7 @@ export default function Partidos() {
                 </div>
             )}
 
-            {/* Pagination */}
+            {/* Paginación */}
             {!loading && total > 30 && (
                 <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '4rem', marginBottom: '2rem' }}>
                     <button className="btn btn-ghost" style={{ padding: '0.8rem 1.5rem', fontSize: '1rem' }} disabled={filters.page <= 1}

@@ -10,11 +10,11 @@ import {
 const router = Router();
 
 // ============================================
-// TEAM ROUTES (PUBLIC)
+// EQUIPOS DE LA API (PUBLICOS)
 // ============================================
 
 router.get('/', getAllTeams);
-router.get('/compare', compareTeams); // lo he puesto delante del /:id porque si no no funcionaba
+router.get('/compare', compareTeams);
 router.get('/:id', getTeamById);
 router.get('/:id/matches', getTeamMatches);
 router.get('/:id/stats', getTeamStats);

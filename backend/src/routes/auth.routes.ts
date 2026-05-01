@@ -17,11 +17,11 @@ import { protect } from '../middlewares/auth.middleware';
 const router = Router();
 
 // ============================================
-// RATE LIMITERS
+// LIMITADORES DE TASA
 // ============================================
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 10, // Limita a 10 peticiones cada 15 min por IP
+    max: 100, // Aumentado a 100 para pruebas
     message: { status: 'error', message: 'Demasiados intentos. Por favor, inténtalo de nuevo más tarde.' }
 });
 
@@ -32,13 +32,13 @@ const passwordRecoveryLimiter = rateLimit({
 });
 
 // ============================================
-// PUBLIC ROUTES
+// RUTAS PÚBLICAS
 // ============================================
 
 router.post('/register', [
     body('name').trim().isLength({ min: 2, max: 50 }).withMessage('El nombre debe tener entre 2 y 50 caracteres'),
     body('email').isEmail().withMessage('Debe ser un email válido').normalizeEmail(),
-    body('password').isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+    body('password').isLength({ min: 8 }).withMessage('La contraseña debe tener al menos 8 caracteres'),
     validateRequest
 ], register);
 
@@ -47,7 +47,7 @@ router.post('/forgot-password', passwordRecoveryLimiter, forgotPassword);
 router.post('/reset-password/:token', passwordRecoveryLimiter, resetPassword);
 
 // ============================================
-// PROTECTED ROUTES
+// RUTAS PROTEGIDAS
 // ============================================
 
 router.use(protect);
@@ -61,4 +61,4 @@ router.patch('/update-profile', [
 router.post('/delete-account', deleteAccount);
 
 export default router;
-
+

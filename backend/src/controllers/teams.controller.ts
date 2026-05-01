@@ -4,7 +4,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { parseId } from '../utils/parse';
 
 // ============================================
-// GET ALL TEAMS
+// OBTENER TODOS LOS EQUIPOS
 // ============================================
 
 export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
@@ -53,7 +53,7 @@ export const getAllTeams = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET TEAM BY ID
+// OBTENER EQUIPO POR ID
 // ============================================
 
 export const getTeamById = catchAsync(async (req: Request, res: Response) => {
@@ -98,7 +98,7 @@ export const getTeamById = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET TEAM MATCHES
+// OBTENER PARTIDOS DEL EQUIPO
 // ============================================
 
 export const getTeamMatches = catchAsync(async (req: Request, res: Response) => {
@@ -144,7 +144,7 @@ export const getTeamMatches = catchAsync(async (req: Request, res: Response) => 
 });
 
 // ============================================
-// GET TEAM STATS
+// OBTENER ESTADÍSTICAS DEL EQUIPO
 // ============================================
 
 export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
@@ -277,7 +277,7 @@ export const getTeamStats = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// COMPARE TWO TEAMS
+// COMPARAR DOS EQUIPOS
 // ============================================
 
 export const compareTeams = catchAsync(async (req: Request, res: Response) => {

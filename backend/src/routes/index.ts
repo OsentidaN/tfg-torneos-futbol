@@ -10,7 +10,7 @@ import favoritesRoutes from './favorites.routes';
 const router = Router();
 
 // ============================================
-// API ROUTES
+// RUTAS DE LA API
 // ============================================
 
 router.use('/auth', authRoutes);
@@ -22,7 +22,7 @@ router.use('/players', playersRoutes);
 router.use('/favorites', favoritesRoutes);
 
 // ============================================
-// API INFO
+// INFORMACIÓN DE LA API
 // ============================================
 
 router.get('/', (_req, res) => {
@@ -38,7 +38,7 @@ router.get('/', (_req, res) => {
             players: '/api/players',
             favorites: '/api/favorites'
         },
-        documentation: 'https://github.com/tu-repo/api-docs'
+        documentation: 'https://github.com/OsentidaN/tfg-torneos-futbol/blob/main/README.md'
     });
 });
 

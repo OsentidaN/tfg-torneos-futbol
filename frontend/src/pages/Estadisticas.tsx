@@ -30,7 +30,7 @@ export default function Estadisticas() {
     const [topScorers, setTopScorers] = useState<any[]>([]);
     const [activeTab, setActiveTab] = useState<ActiveTab>('ranking');
 
-    // Recovery states
+    // Recuperacion de datos en caso de desconexión.
     const [summary, setSummary] = useState<any>(null);
     const [topTeams, setTopTeams] = useState<any[]>([]);
     const [topType, setTopType] = useState<string>('');
@@ -203,7 +203,7 @@ export default function Estadisticas() {
 
     const maxWinPct = Math.max(...topTeams.map((t: any) => t.stats.winPercentage || 0), 1);
 
-    // Tab definitions
+    // Definicion de pestañas
     const tabs = [
         { key: 'ranking' as ActiveTab, label: 'Ranking de Equipos', icon: faTrophy },
         { key: 'detalle' as ActiveTab, label: 'Detalle por Torneo', icon: faSearch },
@@ -232,7 +232,7 @@ export default function Estadisticas() {
 
             </div>
 
-            {/* Dashboard Summary */}
+            {/* Dashboard Resumen*/}
             {summary && (
                 <div className="grid-4" style={{ marginBottom: '3rem' }}>
                     <div className="stat-box">
@@ -266,7 +266,7 @@ export default function Estadisticas() {
                 </div>
             )}
 
-            {/* Tab navigation */}
+            {/* Pestañas */}
             <div className="tabs" style={{ justifyContent: 'center', marginBottom: '3rem', gap: '0.5rem', borderBottom: 'none' }}>
                 {tabs.map(tab => (
                     <button
@@ -287,7 +287,7 @@ export default function Estadisticas() {
                 ))}
             </div>
 
-            {/* ── TAB: Ranking de Equipos ── */}
+            {/* ── Pestaña: Ranking de Equipos ── */}
             {activeTab === 'ranking' && (
                 <div className="card" style={{ padding: '2.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-accent)', maxWidth: '800px', margin: '0 auto', animation: 'fadeIn 0.4s ease' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
@@ -340,7 +340,7 @@ export default function Estadisticas() {
                 </div>
             )}
 
-            {/* ── TAB: Detalle por Torneo ── */}
+            {/* ── PESTAÑA: Detalle por Torneo ── */}
             {activeTab === 'detalle' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }}>
                     <div className="card" style={{ padding: '2.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-accent)', marginBottom: '2rem' }}>
@@ -465,7 +465,7 @@ export default function Estadisticas() {
                 </motion.div>
             )}
 
-            {/* ── TAB: Datos Curiosos ── */}
+            {/* ── PESTAÑA: Datos Curiosos ── */}
             {activeTab === 'curiosos' && (
                 <div style={{ animation: 'fadeIn 0.4s ease' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '3rem' }}>
@@ -495,7 +495,7 @@ export default function Estadisticas() {
                 </div>
             )}
 
-            {/* CTA Comparar */}
+            {/* CTA de comparación*/}
             <div style={{ textAlign: 'center', padding: '2.5rem', background: 'var(--bg-glass)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--border-accent)', marginTop: '4rem' }}>
                 <p style={{ fontFamily: 'Outfit', fontSize: '1.3rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-primary)' }}>¿Quieres comparar dos equipos?</p>
                 <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>

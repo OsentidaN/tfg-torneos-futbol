@@ -4,7 +4,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { FavoriteType } from '@prisma/client';
 
 // ============================================
-// TOGGLE FAVORITE
+// AÑADIR O QUITAR FAVORITOS
 // ============================================
 export const toggleFavorite = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user!.id;
@@ -69,7 +69,7 @@ export const toggleFavorite = catchAsync(async (req: Request, res: Response) => 
 });
 
 // ============================================
-// GET MY FAVORITES
+// OBTENER MIS FAVORITOS
 // ============================================
 export const getMyFavorites = catchAsync(async (req: Request, res: Response) => {
     const userId = req.user!.id;

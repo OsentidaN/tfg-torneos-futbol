@@ -4,7 +4,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { parseId } from '../utils/parse';
 
 // ============================================
-// GET ALL SEASONS
+// OBTENER TODAS LAS TEMPORADAS
 // ============================================
 
 export const getAllSeasons = catchAsync(async (req: Request, res: Response) => {
@@ -36,7 +36,7 @@ export const getAllSeasons = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET SEASON BY ID
+// OBTENER TEMPORADA POR ID
 // ============================================
 
 export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
@@ -74,7 +74,7 @@ export const getSeasonById = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET SEASON MATCHES
+// OBTENER PARTIDOS DE LA TEMPORADA
 // ============================================
 
 export const getSeasonMatches = catchAsync(async (req: Request, res: Response) => {
@@ -107,9 +107,7 @@ export const getSeasonMatches = catchAsync(async (req: Request, res: Response) =
 });
 
 // ============================================
-// GET SEASON TOP SCORERS
-// Usa MatchEvent para contar goles.
-// Excluye penaltis de tanda (minute >= 120 con extraMinute)
+// OBTENER LOS MÁXIMOS GOLEADORES DE LA TEMPORADA
 // ============================================
 
 export const getSeasonTopScorers = catchAsync(async (req: Request, res: Response) => {

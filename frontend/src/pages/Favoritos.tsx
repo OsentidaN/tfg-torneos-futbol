@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { getFavorites } from '../services/api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-    faStar, faTrophy, faFutbol, faClock, 
+import {
+    faStar, faTrophy, faFutbol, faClock,
     faGlobe, faEarthEurope, faHeartCrack, faCalendarDays
 } from '@fortawesome/free-solid-svg-icons';
 import { translateCountryName } from '../utils/formatters';
@@ -27,7 +27,7 @@ export default function Favoritos() {
 
     return (
         <div className="container page">
-            {/* Premium Header */}
+            {/* Header */}
             <div style={{ marginBottom: '3rem' }}>
                 <h1 className="page-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                     <FontAwesomeIcon icon={faStar} style={{ color: 'var(--accent-gold)' }} />
@@ -51,7 +51,7 @@ export default function Favoritos() {
             ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem' }}>
 
-                    {/* SEASONS */}
+                    {/* Temporadas Favoritas */}
                     {favoriteSeasons.length > 0 && (
                         <section>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -65,18 +65,19 @@ export default function Favoritos() {
                                     <Link
                                         key={fav.id}
                                         to={`/torneos/${fav.seasonId}`}
+                                        state={{ from: location.pathname }}
                                         style={{ textDecoration: 'none' }}
                                     >
-                                        <div className="card" style={{ 
-                                            padding: '1.75rem', 
-                                            background: 'var(--bg-card)', 
+                                        <div className="card" style={{
+                                            padding: '1.75rem',
+                                            background: 'var(--bg-card)',
                                             border: '1px solid var(--border-accent)',
-                                            display: 'flex', 
-                                            alignItems: 'center', 
+                                            display: 'flex',
+                                            alignItems: 'center',
                                             gap: '1.25rem',
                                             transition: 'all 0.25s ease'
                                         }}>
-                                            <div style={{ 
+                                            <div style={{
                                                 width: 48, height: 48,
                                                 background: 'var(--bg-secondary)',
                                                 border: '1px solid var(--border)',
@@ -84,7 +85,7 @@ export default function Favoritos() {
                                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                 fontSize: '1.4rem', flexShrink: 0
                                             }}>
-                                                <FontAwesomeIcon 
+                                                <FontAwesomeIcon
                                                     icon={fav.season?.tournament?.type === 'WORLD_CUP' ? faGlobe : faEarthEurope}
                                                     style={{ color: fav.season?.tournament?.type === 'WORLD_CUP' ? 'var(--accent-gold)' : '#58a6ff' }}
                                                 />
@@ -105,7 +106,7 @@ export default function Favoritos() {
                         </section>
                     )}
 
-                    {/* MATCHES */}
+                    {/* Partidos Guardados */}
                     {favoriteMatches.length > 0 && (
                         <section>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
@@ -132,10 +133,10 @@ export default function Favoritos() {
                                             borderRadius: 'var(--radius-lg)',
                                             transition: 'all 0.2s ease',
                                         }}
-                                        onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
-                                        onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
+                                            onMouseEnter={e => (e.currentTarget.style.borderColor = 'var(--accent)')}
+                                            onMouseLeave={e => (e.currentTarget.style.borderColor = 'var(--border-accent)')}
                                         >
-                                            {/* Home Team */}
+                                            {/* Equipo Local */}
                                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '0.75rem' }}>
                                                 <span style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--text-primary)', textAlign: 'right' }}>
                                                     {translateCountryName(fav.match?.homeTeam?.name)}
@@ -145,7 +146,7 @@ export default function Favoritos() {
                                                 )}
                                             </div>
 
-                                            {/* Score */}
+                                            {/* Resultado */}
                                             <div style={{
                                                 fontFamily: 'Outfit',
                                                 fontWeight: 900,
@@ -161,7 +162,7 @@ export default function Favoritos() {
                                                 {fav.match?.homeGoals} – {fav.match?.awayGoals}
                                             </div>
 
-                                            {/* Away Team */}
+                                            {/* Equipo Visitante */}
                                             <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                                                 {fav.match?.awayTeam?.flagUrl && (
                                                     <img src={fav.match.awayTeam.flagUrl} alt="" style={{ width: 32, height: 22, borderRadius: 4, objectFit: 'cover' }} />
@@ -171,7 +172,7 @@ export default function Favoritos() {
                                                 </span>
                                             </div>
 
-                                            {/* Date */}
+                                            {/* Fecha */}
                                             <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', minWidth: 90, textAlign: 'right', flexShrink: 0 }}>
                                                 <FontAwesomeIcon icon={faClock} style={{ marginRight: '0.35rem', opacity: 0.6 }} />
                                                 {new Date(fav.match?.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })}

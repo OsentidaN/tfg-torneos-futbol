@@ -73,7 +73,7 @@ const COUNTRY_TRANSLATIONS: Record<string, string> = {
     "Panama": "Panamá",
     "El Salvador": "El Salvador",
     "Jamaica": "Jamaica",
-    
+
     // Top African Teams
     "Senegal": "Senegal",
     "Morocco": "Marruecos",
@@ -85,7 +85,7 @@ const COUNTRY_TRANSLATIONS: Record<string, string> = {
     "Algeria": "Argelia",
     "Tunisia": "Túnez",
     "South Africa": "Sudáfrica",
-    
+
     // Top Asian/Oceania Teams
     "Japan": "Japón",
     "South Korea": "Corea del Sur",

@@ -24,7 +24,7 @@ export default function Comparar() {
 
     useEffect(() => {
         getTeams({ limit: 200 }).then(r => {
-            const sortedTeams = [...r.data.data].sort((a: any, b: any) => 
+            const sortedTeams = [...r.data.data].sort((a: any, b: any) =>
                 translateCountryName(a.name).localeCompare(translateCountryName(b.name), 'es', { sensitivity: 'base' })
             );
             setTeams(sortedTeams);
@@ -79,17 +79,17 @@ export default function Comparar() {
     };
 
     const NoParticipationMessage = ({ teamName }: { teamName: string }) => (
-        <div style={{ 
-            padding: '1.5rem', 
-            background: 'rgba(247, 129, 102, 0.1)', 
-            border: '1px solid var(--accent-warn)', 
+        <div style={{
+            padding: '1.5rem',
+            background: 'rgba(247, 129, 102, 0.1)',
+            border: '1px solid var(--accent-warn)',
             borderRadius: 'var(--radius-md)',
             textAlign: 'center',
             color: 'var(--accent-warn)',
             fontSize: '0.9rem',
             fontWeight: 500
         }}>
-            ⚠️ {translateCountryName(teamName)} no ha participado en {selectedType === 'WORLD_CUP' ? 'la Copa del Mundo' : 'la Eurocopa'}.
+            {translateCountryName(teamName)} no ha participado en {selectedType === 'WORLD_CUP' ? 'la Copa del Mundo' : 'la Eurocopa'}.
         </div>
     );
 
@@ -98,7 +98,7 @@ export default function Comparar() {
     const maxMatches = Math.max(team1Stats?.matchesPlayed || 0, team2Stats?.matchesPlayed || 0, 1);
     const maxGoals = Math.max(team1Stats?.goalsFor || 0, team2Stats?.goalsFor || 0, 1);
     const maxTitles = Math.max(team1Stats?.titles || 0, team2Stats?.titles || 0, 1);
-    
+
     // Defensive inverted metric (less is better) for visual appeal: we use goals against / matches
     const getDefAvg = (goals: number, matches: number) => matches === 0 ? 0 : goals / matches;
     const def1 = getDefAvg(team1Stats?.goalsAgainst || 0, team1Stats?.matchesPlayed || 1);
@@ -132,17 +132,17 @@ export default function Comparar() {
     };
 
     return (
-        <motion.div 
+        <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            className="container page" 
+            className="container page"
             id="comparar-content"
         >
             <div style={{ marginBottom: '4rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
                 <div>
                     <h1 className="page-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                        <FontAwesomeIcon icon={faScaleBalanced} style={{ color: 'var(--accent)' }} /> 
+                        <FontAwesomeIcon icon={faScaleBalanced} style={{ color: 'var(--accent)' }} />
                         Comparar Equipos
                     </h1>
                     <p className="page-subtitle" style={{ fontSize: '1.2rem', opacity: 0.8 }}>
@@ -162,9 +162,9 @@ export default function Comparar() {
                             {teams.map((t: any) => <option key={t.id} value={t.id}>{translateCountryName(t.name)}</option>)}
                         </select>
                     </div>
-                    
+
                     <div className="vs-divider" style={{ fontSize: '2rem', marginTop: '1.5rem', color: 'var(--accent-warn)' }}>VS</div>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                         <label style={{ fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Selección 2</label>
                         <select className="select" style={{ padding: '1rem 1.5rem', fontSize: '1.1rem', height: 'auto' }} value={team2Id} onChange={e => setTeam2Id(e.target.value)}>
@@ -173,9 +173,9 @@ export default function Comparar() {
                         </select>
                     </div>
                 </div>
-                
+
                 {error && <p style={{ color: 'var(--accent-warn)', textAlign: 'center', marginTop: '1.5rem', fontSize: '1rem', fontWeight: 600 }}>{error}</p>}
-                
+
                 <div style={{ textAlign: 'center', marginTop: '2.5rem' }}>
                     <button className="btn btn-primary" style={{ padding: '1rem 3rem', fontSize: '1.1rem' }} onClick={handleCompare} disabled={loading}>
                         {loading
@@ -185,7 +185,7 @@ export default function Comparar() {
                 </div>
             </div>
 
-            {/* Skeleton Loading State for Results */}
+            {/* Skeleton Loading */}
             {loading && (
                 <div style={{ marginTop: '2rem' }}>
                     <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginBottom: '2rem' }}>
@@ -196,17 +196,17 @@ export default function Comparar() {
                 </div>
             )}
 
-            {/* Filter Tabs */}
+            {/* Filtros comparativas */}
             <div className="tabs" style={{ justifyContent: 'center', marginBottom: '4rem', gap: '1rem', borderBottom: 'none' }}>
-                <button 
-                    className={`tab-btn ${selectedType === 'WORLD_CUP' ? 'active' : ''}`} 
+                <button
+                    className={`tab-btn ${selectedType === 'WORLD_CUP' ? 'active' : ''}`}
                     style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '12px', border: selectedType === 'WORLD_CUP' ? '1px solid var(--accent)' : '1px solid transparent' }}
                     onClick={() => setSelectedType('WORLD_CUP')}
                 >
                     <FontAwesomeIcon icon={faGlobe} style={{ marginRight: '0.5rem' }} /> Mundial
                 </button>
-                <button 
-                    className={`tab-btn ${selectedType === 'EURO_CUP' ? 'active' : ''}`} 
+                <button
+                    className={`tab-btn ${selectedType === 'EURO_CUP' ? 'active' : ''}`}
                     style={{ padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '12px', border: selectedType === 'EURO_CUP' ? '1px solid var(--accent)' : '1px solid transparent' }}
                     onClick={() => setSelectedType('EURO_CUP')}
                 >
@@ -214,15 +214,15 @@ export default function Comparar() {
                 </button>
             </div>
 
-            {/* Results */}
+            {/* Resultados*/}
             {result && t1 && t2 && (
-                <motion.div 
+                <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     transition={{ duration: 0.5, type: 'spring' }}
                     style={{ maxWidth: '1000px', margin: '0 auto' }}
                 >
-                    {/* Team Headers */}
+                    {/* Cabecera  de equipos*/}
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: '3rem', alignItems: 'center', marginBottom: '3rem', padding: '0 2rem' }}>
                         <Link to={`/equipos/${t1.id}`} state={{ from: location.pathname + location.search }} style={{ textDecoration: 'none' }}>
                             <div style={{ textAlign: 'right', display: 'flex', alignItems: 'center', gap: '1.5rem', justifyContent: 'flex-end' }}>
@@ -234,9 +234,9 @@ export default function Comparar() {
                                     : <div className="flag-placeholder" style={{ width: 80, height: 54 }}>?</div>}
                             </div>
                         </Link>
-                        
+
                         <div style={{ fontSize: '1.8rem', fontWeight: 900, color: 'var(--text-muted)', opacity: 0.5 }}>VS</div>
-                        
+
                         <Link to={`/equipos/${t2.id}`} state={{ from: location.pathname + location.search }} style={{ textDecoration: 'none' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
                                 {t2.flagUrl
@@ -250,15 +250,15 @@ export default function Comparar() {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', marginBottom: '4rem' }}>
-                        
-                        {/* Radar Chart Visual Comparison */}
+
+                        {/* Comparación visual */}
                         {!team1Stats?.matchesPlayed || !team2Stats?.matchesPlayed ? null : (
                             <div className="card" style={{ padding: '2rem', background: 'var(--bg-card)', border: '1px solid var(--border-accent)', height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
                                         <PolarGrid stroke="var(--border)" />
                                         <PolarAngleAxis dataKey="subject" tick={{ fill: 'var(--text-muted)', fontSize: 13, fontWeight: 600 }} />
-                                        <Tooltip content={<CustomRadarTooltip />} cursor={{fill: 'rgba(255,255,255,0.05)'}} />
+                                        <Tooltip content={<CustomRadarTooltip />} cursor={{ fill: 'rgba(255,255,255,0.05)' }} />
                                         <Radar name={translateCountryName(t1.name)} dataKey="A" stroke="#667eea" fill="#667eea" fillOpacity={0.4} />
                                         <Radar name={translateCountryName(t2.name)} dataKey="B" stroke="#f6ad55" fill="#f6ad55" fillOpacity={0.4} />
                                     </RadarChart>
@@ -267,10 +267,10 @@ export default function Comparar() {
                         )}
 
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-                            {/* Stats Section Raw Data */}
+                            {/* Estadísticas brutas */}
                             <div className="card" style={{ padding: '2.5rem', background: 'var(--bg-card)', border: '1px solid var(--border-accent)' }}>
                                 <p className="section-title" style={{ fontSize: '1.4rem', marginBottom: '2rem' }}>📊 Desglose de Stats</p>
-                                
+
                                 {team1Stats?.matchesPlayed === 0 || team2Stats?.matchesPlayed === 0 ? (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', padding: '2rem 0' }}>
                                         {team1Stats?.matchesPlayed === 0 && <NoParticipationMessage teamName={t1.name} />}
@@ -321,11 +321,11 @@ export default function Comparar() {
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                                             {h2h?.matches?.map((m: any) => (
                                                 <Link to={`/partidos/${m.id}`} key={m.id} style={{ textDecoration: 'none' }}>
-                                                    <div className="match-row-soft hover-pop" style={{ 
-                                                        display: 'flex', 
-                                                        justifyContent: 'space-between', 
-                                                        alignItems: 'center', 
-                                                        padding: '1rem 1.5rem', 
+                                                    <div className="match-row-soft hover-pop" style={{
+                                                        display: 'flex',
+                                                        justifyContent: 'space-between',
+                                                        alignItems: 'center',
+                                                        padding: '1rem 1.5rem',
                                                         background: 'var(--bg-secondary)',
                                                         border: '1px solid var(--border)',
                                                         borderRadius: '8px',

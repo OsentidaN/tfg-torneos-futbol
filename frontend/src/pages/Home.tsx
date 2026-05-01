@@ -39,7 +39,7 @@ export default function Home() {
                 </div>
             </section>
 
-            {/* STATS */}
+            {/* ESTADÍSTICAS */}
             <div className="container page" style={{ paddingTop: 0 }}>
                 {loading ? (
                     <div className="loading-state"><div className="spinner" /></div>
@@ -87,7 +87,7 @@ export default function Home() {
                             ))}
                         </div>
 
-                        {/* Quick Actions */}
+                        {/* Acciones Rápidas */}
                         <div style={{ marginTop: '5rem', display: 'flex', justifyContent: 'center', gap: '2rem', flexWrap: 'wrap' }}>
                             {[
                                 { to: '/estadisticas', icon: faChartLine, label: 'Estadísticas', desc: 'Clasificaciones y tops' },

@@ -5,7 +5,7 @@ const API_KEY = process.env.API_FOOTBALL_KEY!;
 const API_URL = process.env.API_FOOTBALL_URL!;
 
 /**
- * 🚀 PASO 4: JUGADORES Y ALINEACIONES 
+ * PASO 4: JUGADORES Y ALINEACIONES 
  * 
  * Importa:
  * - Jugadores completos
@@ -22,7 +22,7 @@ const CONFIG = {
 };
 
 async function importPlayersAndLineups() {
-    console.log('👥 ===== JUGADORES Y ALINEACIONES (PLAN DE PAGO) =====\n');
+    console.log('JUGADORES Y ALINEACIONES\n');
 
     const startTime = Date.now();
     let requestCount = 0;
@@ -32,7 +32,7 @@ async function importPlayersAndLineups() {
 
     try {
         // PARTE 1: LINEUPS (todos los partidos)
-        console.log('📋 FASE 1: ALINEACIONES\n');
+        console.log('FASE 1: ALINEACIONES\n');
 
         const matchesForLineups = await prisma.match.findMany({
             where: {
@@ -65,7 +65,7 @@ async function importPlayersAndLineups() {
                 const lineups = response.data.response;
 
                 if (!lineups || lineups.length === 0) {
-                    console.log(`          ⚠️  Sin lineups`);
+                    console.log(`Sin lineups`);
                     await new Promise(r => setTimeout(r, CONFIG.DELAY));
                     continue;
                 }
@@ -176,16 +176,16 @@ async function importPlayersAndLineups() {
                     }
                 }
 
-                console.log(`          ✅ ${count} lineups`);
+                console.log(`${count} lineups`);
                 lineupsProcessed++;
 
                 await new Promise(r => setTimeout(r, CONFIG.DELAY));
 
             } catch (error) {
-                console.error(`          ❌ Error`);
+                console.error(`Error`);
                 errorCount++;
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
-                    console.log('          ⏸️  Rate limit, esperando 30s...');
+                    console.log('Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));
                 }
                 continue;
@@ -193,7 +193,7 @@ async function importPlayersAndLineups() {
         }
 
         // PARTE 2: PLAYER STATS (solo 2016+)
-        console.log('\n📊 FASE 2: ESTADÍSTICAS DE JUGADORES\n');
+        console.log('\nFASE 2: ESTADÍSTICAS DE JUGADORES\n');
 
         const matchesForPlayerStats = await prisma.match.findMany({
             where: {
@@ -238,7 +238,7 @@ async function importPlayersAndLineups() {
                 const playerData = response.data.response;
 
                 if (!playerData || playerData.length === 0) {
-                    console.log(`          ⚠️  Sin stats`);
+                    console.log(`Sin stats`);
                     await new Promise(r => setTimeout(r, CONFIG.DELAY));
                     continue;
                 }
@@ -276,8 +276,8 @@ async function importPlayersAndLineups() {
                                 redCards: stats.cards?.red || 0
                             },
                             create: {
-                                matchId: match.id,    // ← Usa IDs directos
-                                playerId: player.id,  // ← Usa IDs directos
+                                matchId: match.id,
+                                playerId: player.id,
                                 minutesPlayed: stats.games?.minutes ?? 0,
                                 rating: stats.games?.rating ? parseFloat(stats.games.rating) : null,
                                 goals: stats.goals?.total || 0,
@@ -294,16 +294,16 @@ async function importPlayersAndLineups() {
                     }
                 }
 
-                console.log(`          ✅ ${count} player stats`);
+                console.log(`${count} player stats`);
                 playerStatsProcessed++;
 
                 await new Promise(r => setTimeout(r, CONFIG.DELAY));
 
             } catch (error) {
-                console.error(`          ❌ Error`);
+                console.error(`Error`);
                 errorCount++;
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
-                    console.log('          ⏸️  Rate limit, esperando 30s...');
+                    console.log('Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));
                 }
                 continue;
@@ -312,17 +312,17 @@ async function importPlayersAndLineups() {
 
         // Resumen
         const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-        console.log('\n📊 ===== RESUMEN =====');
-        console.log(`⚡ Tiempo: ${elapsed} min`);
-        console.log(`📡 Requests: ${requestCount}`);
-        console.log(`📋 Lineups: ${lineupsProcessed}`);
-        console.log(`📊 Player Stats: ${playerStatsProcessed}`);
-        console.log(`❌ Errores: ${errorCount}`);
+        console.log('\n===== RESUMEN =====');
+        console.log(`Tiempo: ${elapsed} min`);
+        console.log(`Requests: ${requestCount}`);
+        console.log(`Lineups: ${lineupsProcessed}`);
+        console.log(`Player Stats: ${playerStatsProcessed}`);
+        console.log(`Errores: ${errorCount}`);
 
-        console.log('\n✅ IMPORTACIÓN COMPLETADA\n');
+        console.log('\nIMPORTACIÓN COMPLETADA\n');
 
     } catch (error) {
-        console.error('\n❌ Error:', error);
+        console.error('\nError:', error);
         if (axios.isAxiosError(error)) {
             console.error('Detalles:', error.response?.data);
         }

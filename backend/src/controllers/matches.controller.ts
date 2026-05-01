@@ -4,17 +4,17 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { parseId } from '../utils/parse';
 
 // ============================================
-// GET ALL MATCHES
+// OBTENER TODOS LOS PARTIDOS
 // ============================================
 
 export const getAllMatches = catchAsync(async (req: Request, res: Response) => {
-    const { 
-        seasonId, 
-        teamId, 
-        stage, 
+    const {
+        seasonId,
+        teamId,
+        stage,
         status,
         limit = '50',
-        page = '1' 
+        page = '1'
     } = req.query;
 
     const take = parseInt(limit as string);
@@ -66,7 +66,7 @@ export const getAllMatches = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET MATCH BY ID
+// OBTENER PARTIDO POR ID
 // ============================================
 
 export const getMatchById = catchAsync(async (req: Request, res: Response) => {
@@ -103,7 +103,7 @@ export const getMatchById = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET MATCH EVENTS
+// OBTENER LOS EVENTOS DEL PARTIDO
 // ============================================
 
 export const getMatchEvents = catchAsync(async (req: Request, res: Response) => {
@@ -118,13 +118,13 @@ export const getMatchEvents = catchAsync(async (req: Request, res: Response) => 
     }
 
     const events = await prisma.matchEvent.findMany({
-        where: { matchId },  
+        where: { matchId },
         include: {
             player: {
-                select: { 
-                    id: true, 
-                    firstName: true, 
-                    lastName: true 
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true
                 }
             },
         },
@@ -139,7 +139,7 @@ export const getMatchEvents = catchAsync(async (req: Request, res: Response) => 
 });
 
 // ============================================
-// GET MATCH LINEUPS
+// OBTENER LOS ONCES INICIALES DE LOS PARTIDOS
 // ============================================
 
 export const getMatchLineups = catchAsync(async (req: Request, res: Response) => {
@@ -181,7 +181,7 @@ export const getMatchLineups = catchAsync(async (req: Request, res: Response) =>
             homeTeam: {
                 id: match.homeTeam.id,
                 name: match.homeTeam.name,
-                starters: homeLineup.filter((l: any)=> l.starter),
+                starters: homeLineup.filter((l: any) => l.starter),
                 substitutes: homeLineup.filter((l: any) => !l.starter)
             },
             awayTeam: {
@@ -195,7 +195,7 @@ export const getMatchLineups = catchAsync(async (req: Request, res: Response) =>
 });
 
 // ============================================
-// GET MATCH PLAYER STATS
+// OBTENER ESTADÍSTICAS DE LOS JUGADORES DEL PARTIDO
 // ============================================
 
 export const getMatchPlayerStats = catchAsync(async (req: Request, res: Response) => {

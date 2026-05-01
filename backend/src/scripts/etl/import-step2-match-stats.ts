@@ -5,7 +5,6 @@ const API_KEY = process.env.API_FOOTBALL_KEY!;
 const API_URL = process.env.API_FOOTBALL_URL!;
 
 /**
- * 🚀 PASO 2: ESTADÍSTICAS DE PARTIDOS 
  * 
  * Optimizado para suscripción de pago:
  * - Sin límite de requests
@@ -24,7 +23,7 @@ const CONFIG = {
 };
 
 async function importMatchStats() {
-    console.log('📊 ===== ESTADÍSTICAS DE PARTIDOS (PLAN DE PAGO) =====\n');
+    console.log(' ESTADÍSTICAS DE PARTIDOS \n');
 
     const startTime = Date.now();
     let requestCount = 0;
@@ -47,10 +46,10 @@ async function importMatchStats() {
             orderBy: { date: 'desc' }
         });
 
-        console.log(`✓ Encontrados ${matches.length} partidos\n`);
+        console.log(`Encontrados ${matches.length} partidos\n`);
 
         if (matches.length === 0) {
-            console.log('✅ Todos completados\n');
+            console.log('Todos completados\n');
             return;
         }
 
@@ -71,7 +70,7 @@ async function importMatchStats() {
                 const statsData: MatchStats[] = response.data.response;
 
                 if (!statsData || statsData.length === 0) {
-                    console.log(`          ⚠️  Sin datos`);
+                    console.log(`Sin datos`);
                     skippedCount++;
                     await new Promise(r => setTimeout(r, CONFIG.DELAY));
                     continue;
@@ -126,18 +125,18 @@ async function importMatchStats() {
                     });
                 }
 
-                console.log(`          ✅ Guardado`);
+                console.log(`Guardado`);
                 processedCount++;
 
                 // Delay mínimo
                 await new Promise(r => setTimeout(r, CONFIG.DELAY));
 
             } catch (error) {
-                console.error(`          ❌ Error`);
+                console.error(`Error`);
                 errorCount++;
 
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
-                    console.log('          ⏸️  Rate limit, esperando 30s...');
+                    console.log('Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));
                 }
                 continue;
@@ -146,27 +145,27 @@ async function importMatchStats() {
 
         // Resumen
         const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-        console.log('\n📊 ===== RESUMEN =====');
-        console.log(`⚡ Tiempo: ${elapsed} min`);
-        console.log(`📡 Requests: ${requestCount}`);
-        console.log(`✅ Procesados: ${processedCount}`);
-        console.log(`⚠️  Sin datos: ${skippedCount}`);
-        console.log(`❌ Errores: ${errorCount}`);
+        console.log('\nRESUMEN');
+        console.log(`Tiempo: ${elapsed} min`);
+        console.log(`Requests: ${requestCount}`);
+        console.log(`Procesados: ${processedCount}`);
+        console.log(`Sin datos: ${skippedCount}`);
+        console.log(`Errores: ${errorCount}`);
 
         const remaining = await prisma.match.count({
             where: { status: 'FINISHED', teamStats: { none: {} } }
         });
 
         if (remaining === 0) {
-            console.log('\n✅ COMPLETADO');
-            console.log('💡 Siguiente: npm run etl:match-events\n');
+            console.log('COMPLETADO');
+            console.log('Siguiente: npm run etl:match-events\n');
         } else {
-            console.log(`\n⚠️  Quedan ${remaining} partidos`);
-            console.log('💡 Ejecuta de nuevo: npm run etl:match-stats\n');
+            console.log(`Quedan ${remaining} partidos`);
+            console.log('Ejecuta de nuevo: npm run etl:match-stats\n');
         }
 
     } catch (error) {
-        console.error('\n❌ Error:', error);
+        console.error('Error:', error);
         if (axios.isAxiosError(error)) {
             console.error('Detalles:', error.response?.data);
         }

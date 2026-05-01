@@ -1,5 +1,5 @@
-import { Match} from './match'
-import { FavoriteType } from './common'
+import type { Match } from './match'
+import type { FavoriteType } from './common'
 export interface User {
     id: number
     email: string

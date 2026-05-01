@@ -153,9 +153,9 @@ const ResetPassword: React.FC = () => {
                                     className="input"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Mínimo 6 caracteres"
+                                    placeholder="Mínimo 8 caracteres, números y signos"
                                     required
-                                    minLength={6}
+                                    minLength={8}
                                     disabled={status === 'loading'}
                                     style={{ paddingRight: '3rem' }}
                                 />

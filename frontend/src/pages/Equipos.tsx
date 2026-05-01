@@ -11,20 +11,20 @@ export default function Equipos() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Fetch all teams once to allow local searching by translated names
+        // Trae todos los equipos una vez para permitir la búsqueda local por nombres traducidos
         getTeams({ limit: 500 })
             .then(r => setAllTeams(r.data.data))
             .catch(console.error)
             .finally(() => setLoading(false));
     }, []);
 
-    // Filter teams locally by both English and Spanish names
+    // Filtra equipos localmente por nombres en inglés y español
     const filteredTeams = allTeams.filter(team => {
         if (!search) return true;
         const searchLower = search.toLowerCase();
         const translatedName = translateCountryName(team.name).toLowerCase();
         const originalName = team.name.toLowerCase();
-        
+
         return translatedName.includes(searchLower) || originalName.includes(searchLower);
     });
 
@@ -32,7 +32,7 @@ export default function Equipos() {
         <div className="container page">
             <div style={{ marginBottom: '4rem' }}>
                 <h1 className="page-title" style={{ fontSize: '3.5rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-                    <FontAwesomeIcon icon={faShieldHalved} style={{ color: 'var(--accent)' }} /> 
+                    <FontAwesomeIcon icon={faShieldHalved} style={{ color: 'var(--accent)' }} />
                     Equipos
                 </h1>
                 <p className="page-subtitle" style={{ fontSize: '1.2rem', opacity: 0.8 }}>
@@ -59,10 +59,10 @@ export default function Equipos() {
             ) : filteredTeams.length === 0 ? (
                 <div className="empty-state"><span className="empty-icon">🛡️</span><p>No se encontraron equipos</p></div>
             ) : (
-                <div style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))', 
-                    gap: '2rem' 
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(420px, 1fr))',
+                    gap: '2rem'
                 }}>
                     {filteredTeams.map((team: any) => (
                         <Link to={`/equipos/${team.id}`} key={team.id} style={{ textDecoration: 'none' }}>
@@ -72,10 +72,10 @@ export default function Equipos() {
                                         ? <img src={team.flagUrl} alt={team.name} style={{ width: 80, height: 54, flexShrink: 0, objectFit: 'cover', borderRadius: 4, border: '1px solid var(--border)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }} />
                                         : <div className="flag-placeholder" style={{ width: 80, height: 54, flexShrink: 0, fontSize: '2rem' }}>?</div>}
                                     <div style={{ minWidth: 0, flex: 1 }}>
-                                        <div style={{ 
-                                            fontWeight: 800, 
-                                            fontSize: '1.6rem', 
-                                            color: 'var(--text-primary)', 
+                                        <div style={{
+                                            fontWeight: 800,
+                                            fontSize: '1.6rem',
+                                            color: 'var(--text-primary)',
                                             marginBottom: '0.4rem',
                                             lineHeight: 1.2,
                                             wordBreak: 'normal',

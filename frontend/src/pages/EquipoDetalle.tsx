@@ -94,7 +94,7 @@ export default function EquipoDetalle() {
             {activeTab === 'torneos' && (
                 <div className="grid-3">
                     {team.seasonTeams?.sort((a: any, b: any) => b.season.year - a.season.year).map((st: any) => (
-                        <Link to={`/torneos/${st.seasonId}`} key={st.id} style={{ textDecoration: 'none' }}>
+                        <Link to={`/torneos/${st.seasonId}`} state={{ from: location.pathname }} key={st.id} style={{ textDecoration: 'none' }}>
                             <div className="card card-link">
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
                                     <span style={{ fontFamily: 'Outfit', fontSize: '1.5rem', fontWeight: 800 }}>{st.season.year}</span>
@@ -127,7 +127,7 @@ export default function EquipoDetalle() {
                     {matches.length === 0
                         ? <div className="empty-state"><span className="empty-icon">⚽</span><p>Sin partidos registrados</p></div>
                         : matches.map((m: any) => (
-                            <Link to={`/partidos/${m.id}`} key={m.id} style={{ textDecoration: 'none' }}>
+                            <Link to={`/partidos/${m.id}`} state={{ from: location.pathname }} key={m.id} style={{ textDecoration: 'none' }}>
                                 <div className="match-card">
                                     <div style={{ flex: 1, textAlign: 'right' }}>
                                         <div className="team-flag" style={{ justifyContent: 'flex-end' }}>

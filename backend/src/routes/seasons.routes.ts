@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 // ============================================
-// SEASON ROUTES (PUBLIC)
+// TEMPORADAS DE LA API (PUBLICAS)
 // ============================================
 
 router.get('/', getAllSeasons);

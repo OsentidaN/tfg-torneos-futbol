@@ -34,7 +34,7 @@ const ForgotPassword: React.FC = () => {
         >
             <div className="glass-card" style={{ maxWidth: '440px', width: '100%' }}>
 
-                {/* Icon */}
+                {/* Icono */}
                 <div style={{ textAlign: 'center', marginBottom: '1.5rem' }}>
                     <div style={{
                         width: '64px', height: '64px', borderRadius: '50%',
@@ -53,7 +53,7 @@ const ForgotPassword: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Success state simplificado ya que toast asume el texto */}
+                {/* Estado de éxito */}
                 {status === 'success' && (
                     <div style={{
                         background: 'rgba(72, 187, 120, 0.1)',
@@ -73,7 +73,7 @@ const ForgotPassword: React.FC = () => {
                     </div>
                 )}
 
-                {/* Form — ocultar si ya fue enviado con éxito */}
+                {/* Form — ocultar si ya ha sido enviado con éxito */}
                 {status !== 'success' && (
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         <div>

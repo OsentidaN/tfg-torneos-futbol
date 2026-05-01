@@ -4,7 +4,7 @@ import { catchAsync, AppError } from '../middlewares/error.middleware';
 import { parseId } from '../utils/parse';
 
 // ============================================
-// GET ALL PLAYERS
+// OBTENER TODOS LOS JUGADORES
 // ============================================
 
 export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
@@ -57,7 +57,7 @@ export const getAllPlayers = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET PLAYER BY ID
+// OBTENER JUGADOR POR ID
 // ============================================
 
 export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
@@ -130,9 +130,7 @@ export const getPlayerById = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET TOP SCORERS
-// Usa MatchEvent igual que getSeasonTopScorers.
-// Excluye penaltis de tanda (minute >= 120 con extraMinute)
+// OBTENER LOS MÁXIMOS GOLEADORES
 // ============================================
 
 export const getTopScorers = catchAsync(async (req: Request, res: Response) => {
@@ -237,7 +235,7 @@ export const getTopScorers = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET TOP ASSISTS
+// OBTENER LOS MÁXIMOS ASISTENTES
 // ============================================
 
 export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
@@ -311,7 +309,7 @@ export const getTopAssists = catchAsync(async (req: Request, res: Response) => {
 });
 
 // ============================================
-// GET PLAYER STATS BY SEASON
+// OBTENER ESTADÍSTICAS DEL JUGADOR POR TEMPORADA
 // ============================================
 
 export const getPlayerStatsBySeason = catchAsync(async (req: Request, res: Response) => {

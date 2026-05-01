@@ -12,7 +12,7 @@ export const APP_NAME = 'Fútbol en Datos'
 export const APP_VERSION = '1.0.0'
 
 // ============================================
-// TOURNAMENT TYPES
+//  TYPES DE TORNEO
 // ============================================
 
 export const TOURNAMENT_TYPES = {
@@ -31,7 +31,7 @@ export const TOURNAMENT_DESCRIPTIONS: Record<string, string> = {
 }
 
 // ============================================
-// MATCH STAGES
+//  ETAPAS DE PARTIDO
 // ============================================
 
 export const MATCH_STAGES = {
@@ -53,7 +53,7 @@ export const STAGE_NAMES: Record<string, string> = {
 }
 
 // ============================================
-// MATCH STATUS
+//  ESTADOS DE PARTIDO
 // ============================================
 
 export const MATCH_STATUS = {
@@ -73,7 +73,7 @@ export const STATUS_COLORS: Record<string, string> = {
 }
 
 // ============================================
-// PLAYER POSITIONS
+//  POSICIONES DE JUGADORES
 // ============================================
 
 export const POSITIONS = {
@@ -98,7 +98,7 @@ export const POSITION_ABBREVIATIONS: Record<string, string> = {
 }
 
 // ============================================
-// EVENT TYPES
+// TIPOS DE EVENTOS
 // ============================================
 export const EVENT_TYPES = {
     GOAL: 'GOAL',
@@ -115,7 +115,7 @@ export const EVENT_TYPES = {
 } as const
 
 // ============================================
-// EVENT ICONS
+// ICONOS DE EVENTOS
 // ============================================
 export const EVENT_ICONS: Record<keyof typeof EVENT_TYPES, string> = {
     GOAL: '⚽',             // Gol normal
@@ -132,14 +132,14 @@ export const EVENT_ICONS: Record<keyof typeof EVENT_TYPES, string> = {
 }
 
 // ============================================
-// PAGINATION
+// PAGINACIÓN
 // ============================================
 
 export const DEFAULT_PAGE_SIZE = 20
 export const PAGE_SIZE_OPTIONS = [10, 20, 50, 100]
 
 // ============================================
-// LOCAL STORAGE KEYS
+// CLAVES DE ALMACENAMIENTO LOCAL
 // ============================================
 
 export const STORAGE_KEYS = {
@@ -150,7 +150,7 @@ export const STORAGE_KEYS = {
 } as const
 
 // ============================================
-// ROUTES
+// RUTAS
 // ============================================
 
 export const ROUTES = {
@@ -175,7 +175,7 @@ export const ROUTES = {
 } as const
 
 // ============================================
-// FAVORITE TYPES
+// TIPOS DE FAVORITOS
 // ============================================
 
 export const FAVORITE_TYPES = {

@@ -23,8 +23,8 @@ const CONFIG = {
 };
 
 async function importBasicData() {
-    console.log('🚀 ===== IMPORTACIÓN BÁSICA =====\n');
-    console.log('⚡ Delays reducidos - Procesamiento acelerado\n');
+    console.log(' ===== IMPORTACIÓN BÁSICA =====\n');
+    console.log('Delays reducidos - Procesamiento acelerado\n');
 
     let totalRequests = 0;
     const startTime = Date.now();
@@ -37,13 +37,13 @@ async function importBasicData() {
                 where: { year, tournament: { type: tournamentType as 'WORLD_CUP' | 'EURO_CUP' } }
             });
             if (!season) {
-                console.log(`⚠️  Temporada ${year} no encontrada en BD`);
+                console.log(`Temporada ${year} no encontrada en BD`);
                 return;
             }
 
-            console.log(`\n📌 ${league.name} ${year} - INICIANDO...`);
+            console.log(`\n ${league.name} ${year} - INICIANDO...`);
 
-            // 1️⃣ Fixtures
+            // 1️ Fixtures
             const fixturesResp = await axios.get(`${API_URL}/fixtures`, {
                 headers: { 'x-apisports-key': API_KEY },
                 params: { league: league.id, season: year }
@@ -52,11 +52,11 @@ async function importBasicData() {
             const fixtures = fixturesResp.data.response;
 
             if (fixtures.length === 0) {
-                console.log('   ⚠️  Sin partidos');
+                console.log('Sin partidos');
                 return;
             }
 
-            // 2️⃣ Equipos
+            // 2️ Equipos
             const extractedTeams = new Map<number, any>();
             for (const f of fixtures) {
                 extractedTeams.set(f.teams.home.id, f.teams.home);
@@ -89,9 +89,9 @@ async function importBasicData() {
                 });
                 teamsInserted++;
             }
-            console.log(`   ✅ ${teamsInserted} equipos`);
+            console.log(`${teamsInserted} equipos`);
 
-            // 3️⃣ Clasificaciones
+            // 3️ Clasificaciones
             const standingsResp = await axios.get(`${API_URL}/standings`, {
                 headers: { 'x-apisports-key': API_KEY },
                 params: { league: league.id, season: year }
@@ -137,10 +137,10 @@ async function importBasicData() {
                         standingsInserted++;
                     }
                 }
-                console.log(`   ✅ ${standingsInserted} clasificaciones`);
+                console.log(`${standingsInserted} clasificaciones`);
             }
 
-            // 4️⃣ Partidos
+            // 4️ Partidos
             let matchesInserted = 0;
             for (const fixture of fixtures) {
                 const homeTeam = await prisma.team.findUnique({ where: { apiId: fixture.teams.home.id } });
@@ -196,11 +196,11 @@ async function importBasicData() {
                 });
                 matchesInserted++;
             }
-            console.log(`   ✅ ${matchesInserted} partidos`);
+            console.log(`${matchesInserted} partidos`);
 
-            // 5️⃣ Calcular stats si no había standings
+            // 5️ Calcular stats si no había standings
             if (standingsInserted === 0 && matchesInserted > 0) {
-                console.log(`   🔄 Calculando stats...`);
+                console.log(`Calculando stats...`);
 
                 const seasonMatches = await prisma.match.findMany({
                     where: { seasonId: season.id, status: 'FINISHED' }
@@ -251,12 +251,12 @@ async function importBasicData() {
                         data: stats
                     });
                 }
-                console.log(`   ✅ ${teamStats.size} stats calculadas`);
+                console.log(`${teamStats.size} stats calculadas`);
             }
 
             // ⚡ Delay reducido (200ms en lugar de 2000ms)
             await new Promise(r => setTimeout(r, CONFIG.DELAY_BETWEEN_REQUESTS));
-            console.log(`   ⚡ ${league.name} ${year} COMPLETADO`);
+            console.log(`${league.name} ${year} COMPLETADO`);
         }
 
         // Procesar todos los torneos
@@ -270,9 +270,9 @@ async function importBasicData() {
 
         // Resumen final
         const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-        console.log('\n📊 ===== RESUMEN FINAL =====');
-        console.log(`⚡ Tiempo total: ${elapsed} minutos`);
-        console.log(`📡 Requests: ${totalRequests}`);
+        console.log('\n ===== RESUMEN FINAL =====');
+        console.log(`Tiempo total: ${elapsed} minutos`);
+        console.log(`Requests: ${totalRequests}`);
 
         const [teams, seasonTeams, matches] = await Promise.all([
             prisma.team.count(),
@@ -284,11 +284,11 @@ async function importBasicData() {
         console.log(`  Equipos: ${teams}`);
         console.log(`  Participaciones: ${seasonTeams}`);
         console.log(`  Partidos: ${matches}`);
-        console.log('\n✅ ===== IMPORTACIÓN COMPLETADA =====');
-        console.log('💡 Siguiente: npm run etl:match-stats\n');
+        console.log('\n IMPORTACIÓN COMPLETADA');
+        console.log(' Siguiente: npm run etl:match-stats\n');
 
     } catch (error) {
-        console.error('\n❌ Error:', error);
+        console.error('\n Error:', error);
         if (axios.isAxiosError(error)) console.error('API Error:', error.response?.data);
     } finally {
         await prisma.$disconnect();

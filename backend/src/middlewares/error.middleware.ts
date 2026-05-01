@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 // ============================================
-// CUSTOM ERROR CLASS
+// CLASE PERSONALIZADA DE ERROR
 // ============================================
 
 export class AppError extends Error {
@@ -34,7 +34,7 @@ export const errorMiddleware = (
 
     // Log en desarrollo
     if (process.env.NODE_ENV !== 'production') {
-        console.error('❌ ERROR:', {
+        console.error('ERROR:', {
             message: err.message,
             stack: err.stack,
             code: err.code
@@ -99,15 +99,15 @@ export const errorMiddleware = (
     return res.status(err.statusCode).json({
         status: err.status,
         message: err.message,
-        ...(process.env.NODE_ENV !== 'production' && { 
+        ...(process.env.NODE_ENV !== 'production' && {
             stack: err.stack,
-            error: err 
+            error: err
         })
     });
 };
 
 // ============================================
-// ASYNC ERROR CATCHER
+// CAPTURADOR DE ERRORES ASYNCRONOS
 // ============================================
 
 export const catchAsync = (fn: Function) => {

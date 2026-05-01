@@ -1,5 +1,5 @@
-import { TournamentType } from './common'
-import { Season } from './seasons'
+import type { TournamentType } from './common'
+import type { Season } from './seasons'
 
 export interface Tournament {
     id: number
@@ -24,7 +24,7 @@ export interface TournamentStats {
         finishedMatches: number
         totalGoals: number
         avgGoalsPerMatch: number
-    }   
+    }
 }
 
 export interface TournamentWinner {
@@ -34,7 +34,7 @@ export interface TournamentWinner {
         name: string;
         flagUrl: string | null;
     };
-    runnerUp: {          
+    runnerUp: {
         id: number;
         name: string;
         flagUrl: string | null;

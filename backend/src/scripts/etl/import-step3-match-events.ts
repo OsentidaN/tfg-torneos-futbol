@@ -5,7 +5,7 @@ const API_KEY = process.env.API_FOOTBALL_KEY!;
 const API_URL = process.env.API_FOOTBALL_URL!;
 
 /**
- * 🚀 PASO 3: EVENTOS DE PARTIDOS 
+ * PASO 3: EVENTOS DE PARTIDOS 
  * Importa eventos minuto a minuto:
  * - Goles, tarjetas, sustituciones
  * - Crea jugadores automáticamente
@@ -27,7 +27,7 @@ const CONFIG = {
 };
 
 async function importMatchEvents() {
-    console.log('🎯 ===== EVENTOS DE PARTIDOS (PLAN DE PAGO) =====\n');
+    console.log('EVENTOS DE PARTIDOS\n');
 
     const startTime = Date.now();
     let requestCount = 0;
@@ -50,10 +50,10 @@ async function importMatchEvents() {
             orderBy: { date: 'desc' }
         });
 
-        console.log(`✓ Encontrados ${matches.length} partidos\n`);
+        console.log(`Encontrados ${matches.length} partidos\n`);
 
         if (matches.length === 0) {
-            console.log('✅ Todos completados\n');
+            console.log('Todos completados\n');
             return;
         }
 
@@ -74,7 +74,7 @@ async function importMatchEvents() {
                 const events: MatchEvent[] = response.data.response;
 
                 if (!events || events.length === 0) {
-                    console.log(`          ⚠️  Sin eventos`);
+                    console.log(`Sin eventos`);
                     await new Promise(r => setTimeout(r, CONFIG.DELAY));
                     continue;
                 }
@@ -139,18 +139,18 @@ async function importMatchEvents() {
                     }
                 }
 
-                console.log(`          ✅ ${eventsCreated} eventos`);
+                console.log(`${eventsCreated} eventos`);
                 totalEventsCreated += eventsCreated;
                 processedCount++;
 
                 await new Promise(r => setTimeout(r, CONFIG.DELAY));
 
             } catch (error) {
-                console.error(`          ❌ Error`);
+                console.error(`Error`);
                 errorCount++;
 
                 if (axios.isAxiosError(error) && error.response?.status === 429) {
-                    console.log('          ⏸️  Rate limit, esperando 30s...');
+                    console.log('Rate limit, esperando 30s...');
                     await new Promise(r => setTimeout(r, 30000));
                 }
                 continue;
@@ -159,27 +159,27 @@ async function importMatchEvents() {
 
         // Resumen
         const elapsed = ((Date.now() - startTime) / 1000 / 60).toFixed(1);
-        console.log('\n📊 ===== RESUMEN =====');
-        console.log(`⚡ Tiempo: ${elapsed} min`);
-        console.log(`📡 Requests: ${requestCount}`);
-        console.log(`✅ Partidos: ${processedCount}`);
-        console.log(`🎯 Eventos: ${totalEventsCreated}`);
-        console.log(`❌ Errores: ${errorCount}`);
+        console.log('\n RESUMEN');
+        console.log(`Tiempo: ${elapsed} min`);
+        console.log(`Requests: ${requestCount}`);
+        console.log(`Partidos: ${processedCount}`);
+        console.log(`Eventos: ${totalEventsCreated}`);
+        console.log(`Errores: ${errorCount}`);
 
         const remaining = await prisma.match.count({
             where: { status: 'FINISHED', events: { none: {} } }
         });
 
         if (remaining === 0) {
-            console.log('\n✅ COMPLETADO');
-            console.log('💡 Siguiente: npm run etl:players-lineups\n');
+            console.log('COMPLETADO');
+            console.log('Siguiente: npm run etl:players-lineups\n');
         } else {
-            console.log(`\n⚠️  Quedan ${remaining} partidos`);
-            console.log('💡 Ejecuta de nuevo: npm run etl:match-events\n');
+            console.log(`Quedan ${remaining} partidos`);
+            console.log('Ejecuta de nuevo: npm run etl:match-events\n');
         }
 
     } catch (error) {
-        console.error('\n❌ Error:', error);
+        console.error('Error:', error);
         if (axios.isAxiosError(error)) {
             console.error('Detalles:', error.response?.data);
         }

@@ -10,12 +10,12 @@ import {
 const router = Router();
 
 // ============================================
-// PLAYER ROUTES (PUBLIC)
+// JUGADORES DE LA API (PUBLICOS)
 // ============================================
 
 router.get('/', getAllPlayers);
-router.get('/top-scorers', getTopScorers); // Lo he puesto antes del /:id porque si no no funcionaba
-router.get('/top-assists', getTopAssists);  // Lo he puesto antes del /:id porque si no no funcionaba
+router.get('/top-scorers', getTopScorers);
+router.get('/top-assists', getTopAssists);
 router.get('/:id', getPlayerById);
 router.get('/:id/stats/season', getPlayerStatsBySeason);
 
